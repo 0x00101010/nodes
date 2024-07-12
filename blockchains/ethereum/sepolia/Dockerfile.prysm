@@ -30,14 +30,6 @@ RUN asdf plugin add golang && \
     asdf install golang ${GO_VERSION} && \
     asdf global golang ${GO_VERSION}
 
-# install bazel
-# ENV BAZEL_VERSION=7.2.1
-# RUN curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
-# RUN mv bazel-archive-keyring.gpg /usr/share/keyrings
-# RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-# RUN apt update && apt install -y bazel-$BAZEL_VERSION
-# RUN ln -s /usr/bin/baezel-$BAZEL_VERSION /usr/bin/bazel
-
 # download source code
 ENV REPO=https://github.com/prysmaticlabs/prysm.git
 ENV VERSION=v5.0.3
