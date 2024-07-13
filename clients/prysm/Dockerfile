@@ -31,16 +31,20 @@ RUN asdf plugin add golang && \
     asdf global golang ${GO_VERSION}
 
 # download source code
-ENV REPO=https://github.com/ethereum/go-ethereum.git
-ENV VERSION=v1.14.7
-ENV COMMIT=aa55f5ea200dfd07618fdf658d9d2741c3b376a8
+ENV REPO=https://github.com/prysmaticlabs/prysm.git
+ENV VERSION=v5.0.3
+ENV COMMIT=38f208d70dc95b12c08403f5c72009aaa10dfe2f
 RUN git clone $REPO --branch $VERSION --single-branch . && \
     git switch -c $VERSION && \
     bash -c '[ "$(git rev-parse HEAD)" = "$COMMIT" ]'
 
 # build
+# The flag below may be needed if blst throws SIGILL, which happens with certain (older) CPUs
+# ENV CGO_CFLAGS="-O -D__BLST_PORTABLE__"
+# ENV CGO_CFLAGS=$CGO_CFLAGS
 RUN go mod tidy
-RUN make geth
+RUN go build -o /build/beacon-node  ./cmd/beacon-chain
+RUN go build -o /build/validator    ./cmd/validator
 
 FROM ubuntu:24.04
 
@@ -51,4 +55,8 @@ RUN apt-get update && \
     iproute2
 
 WORKDIR /app
-COPY --from=builder /app/build/bin/geth  /app/
+
+COPY --from=builder /build/beacon-node  /app/
+COPY --from=builder /build/validator    /app/
+COPY ./beacon-node-entrypoint.sh        /app/
+COPY ./validator-entrypoint.sh          /app/

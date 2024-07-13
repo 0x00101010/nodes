@@ -1,0 +1,20 @@
+services:
+  geth:
+    build:
+      context: ../../../clients/geth
+      dockerfile: Dockerfile
+    command: [ "/app/geth-entrypoint.sh" ]
+    volumes:
+      - geth_data:/data
+      - type: bind
+        source: ../../../clients/shared/jwtsecret
+        target: /config/jwtsecret
+    ports:
+      - "8545:8545"
+      - "8551:8551"
+    env_file:
+      - .geth.env
+
+volumes:
+  geth_data:
+  prysm_data:
