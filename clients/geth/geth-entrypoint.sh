@@ -13,8 +13,8 @@ GETH_GCMODE="${GETH_GCMODE:-full}"
 GETH_SYNCMODE="${GETH_SYNCMODE:-full}"
 GETH_STATE_SCHEME="${GETH_STATE_SCHEME:-path}"
 GETH_MAX_PEERS="${GETH_MAX_PEERS:-100}"
-GETH_ALLOWED_APIS="${GETH_ALLOWED_APIS:-admin,db,debug,eth,net,txpool,web3}"
-GETH_P2P_ADDRESS="${GETH_P2P_ADDRESS:-}"
+GETH_ALLOWED_APIS="${GETH_ALLOWED_APIS:-admin,debug,eth,net,txpool,web3}"
+GETH_P2P_ENABLE_UPNP="${GETH_P2P_ENABLE_UPNP:-true}"
 if [ -f /config/jwtsecret ]; then
     GETH_ENGINE_AUTH=$(cat /config/jwtsecret)
 fi
@@ -41,9 +41,11 @@ fi
 #     ADDITIONAL_ARGS="$ADDITIONAL_ARGS --rpc.allow-unprotected-txs=$GETH_ALLOW_UNPROTECTED_TXS"
 # fi
 
-if [ "${GETH_P2P_ADDRESS:+x}" = x ]; then
-	ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=extip:$GETH_P2P_ADDRESS"
-fi 
+if [ "$GETH_P2P_ENABLE_UPNP" = "true" ]; then
+	ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=upnp"
+elif [ "${GETH_P2P_ADDRESS:+x}" = x ]
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=extip:$GETH_P2P_ADDRESS"
+fi
 
 exec ./geth \
     --datadir="$GETH_DATA_DIR" \

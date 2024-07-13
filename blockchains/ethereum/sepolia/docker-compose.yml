@@ -12,7 +12,10 @@ services:
     ports:
       - "8545:8545"
       - "8551:8551"
+      - "30303:30303"
+      - "30303:30303/udp"
     env_file:
+      - .env.local
       - .geth.env
 
 volumes:
