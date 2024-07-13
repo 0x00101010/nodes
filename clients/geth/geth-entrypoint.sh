@@ -13,14 +13,14 @@ GETH_GCMODE="${GETH_GCMODE:-full}"
 GETH_SYNCMODE="${GETH_SYNCMODE:-full}"
 GETH_STATE_SCHEME="${GETH_STATE_SCHEME:-path}"
 GETH_MAX_PEERS="${GETH_MAX_PEERS:-100}"
+GETH_ALLOWED_APIS="${GETH_ALLOWED_APIS:-admin,db,debug,eth,net,txpool,web3}"
+GETH_P2P_ADDRESS="${GETH_P2P_ADDRESS:-}"
 if [ -f /config/jwtsecret ]; then
     GETH_ENGINE_AUTH=$(cat /config/jwtsecret)
 fi
 
 # setup
 mkdir -p $GETH_DATA_DIR
-HOST_IP="" # put your external IP address here and open port 30303 to improve peer connectivity
-
 
 # dynamically configure ADDITIONAL_ARGS
 ADDITIONAL_ARGS=""
@@ -41,8 +41,8 @@ fi
 #     ADDITIONAL_ARGS="$ADDITIONAL_ARGS --rpc.allow-unprotected-txs=$GETH_ALLOW_UNPROTECTED_TXS"
 # fi
 
-if [ "${HOST_IP:+x}" = x ]; then
-	ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=extip:$HOST_IP"
+if [ "${GETH_P2P_ADDRESS:+x}" = x ]; then
+	ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=extip:$GETH_P2P_ADDRESS"
 fi 
 
 exec ./geth \
@@ -53,7 +53,7 @@ exec ./geth \
     --http.vhosts="*" \
     --http.addr=0.0.0.0 \
     --http.port="$GETH_RPC_PORT" \
-    --http.api=web3,debug,eth,net,engine \
+    --http.api="$GETH_ALLOWED_APIS" \
     --authrpc.addr=0.0.0.0 \
     --authrpc.port="$GETH_AUTHRPC_PORT" \
     --authrpc.vhosts="*" \
@@ -62,7 +62,7 @@ exec ./geth \
     --ws.addr=0.0.0.0 \
     --ws.port="$GETH_WS_PORT" \
     --ws.origins="*" \
-    --ws.api=debug,eth,net,engine \
+    --ws.api="$GETH_ALLOWED_APIS" \
     --metrics \
     --metrics.addr=0.0.0.0 \
     --metrics.port="$GETH_METRICS_PORT" \
