@@ -2,8 +2,8 @@
 set -eu
 
 # 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=detail
-GETH_VERBOSITY=${GETH_VERBOSITY:-3}
-GETH_DATA_DIR=/data
+GETH_VERBOSITY="${GETH_VERBOSITY:-3}"
+GETH_DATA_DIR="${GETH_DATA_DIR:-/data}"
 GETH_RPC_PORT="${GETH_RPC_PORT:-8545}"
 GETH_WS_PORT="${GETH_WS_PORT:-8546}"
 GETH_AUTHRPC_PORT="${GETH_AUTHRPC_PORT:-8551}"
@@ -15,9 +15,6 @@ GETH_STATE_SCHEME="${GETH_STATE_SCHEME:-path}"
 GETH_MAX_PEERS="${GETH_MAX_PEERS:-100}"
 GETH_ALLOWED_APIS="${GETH_ALLOWED_APIS:-admin,debug,eth,net,txpool,web3}"
 GETH_P2P_ENABLE_UPNP="${GETH_P2P_ENABLE_UPNP:-true}"
-if [ -f /config/jwtsecret ]; then
-    GETH_ENGINE_AUTH=$(cat /config/jwtsecret)
-fi
 
 # setup
 mkdir -p $GETH_DATA_DIR
@@ -25,27 +22,19 @@ mkdir -p $GETH_DATA_DIR
 # dynamically configure ADDITIONAL_ARGS
 ADDITIONAL_ARGS=""
 
-if [ "${GETH_SEPOIA:+x}" = x ]; then
-    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --sepolia"
+if [ -n "$NETWORK" ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --$NETWORK"
 fi
 
-if [ "${GETH_MAINNET:+x}" = x ]; then
-    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --mainnet"
-fi
-
-if [ "${GETH_HOLESKY:+x}" = x ]; then
-    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --holesky"
+if [ "$GETH_P2P_ENABLE_UPNP" = "true" ]; then
+	ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=upnp"
+elif [ "${GETH_P2P_ADDRESS:+x}" = x ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=extip:$GETH_P2P_ADDRESS"
 fi
 
 # if [ "${GETH_ALLOW_UNPROTECTED_TXS+x}" = x ]; then
 #     ADDITIONAL_ARGS="$ADDITIONAL_ARGS --rpc.allow-unprotected-txs=$GETH_ALLOW_UNPROTECTED_TXS"
 # fi
-
-if [ "$GETH_P2P_ENABLE_UPNP" = "true" ]; then
-	ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=upnp"
-elif [ "${GETH_P2P_ADDRESS:+x}" = x ]
-    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=extip:$GETH_P2P_ADDRESS"
-fi
 
 exec ./geth \
     --datadir="$GETH_DATA_DIR" \
@@ -59,7 +48,7 @@ exec ./geth \
     --authrpc.addr=0.0.0.0 \
     --authrpc.port="$GETH_AUTHRPC_PORT" \
     --authrpc.vhosts="*" \
-    --authrpc.jwtsecret="$GETH_ENGINE_AUTH" \
+    --authrpc.jwtsecret=/config/jwtsecret \
     --ws \
     --ws.addr=0.0.0.0 \
     --ws.port="$GETH_WS_PORT" \
