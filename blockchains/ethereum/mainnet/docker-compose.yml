@@ -1,0 +1,43 @@
+volumes:
+  geth_data:
+  prysm_data:
+
+
+services:
+  geth:
+    build:
+      context: ../../../clients/geth
+      dockerfile: Dockerfile
+    command: [ "/app/geth-entrypoint.sh" ]
+    volumes:
+      - geth_data:/data
+      - type: bind
+        source: ../../../clients/shared/jwtsecret
+        target: /config/jwtsecret
+    ports:
+      - "${GETH_RPC_PORT}:${GETH_RPC_PORT}" # json rpc
+      - "${GETH_WS_PORT}:${GETH_WS_PORT}" # ws rpc
+      - "${GETH_METRICS_PORT}:${GETH_METRICS_PORT}" # prometheus at host 7001
+      - "${GETH_P2P_PORT}:${GETH_P2P_PORT}" # p2p
+      - "${GETH_P2P_PORT}:${GETH_P2P_PORT}/udp" # p2p udp
+    env_file:
+      - .env
+
+  beacon-node:
+    build:
+      context: ../../../clients/prysm
+      dockerfile: Dockerfile
+    command: [ "/app/beacon-node-entrypoint.sh" ]
+    volumes:
+      - prysm_data:/data
+      - type: bind
+        source: ../../../clients/shared/jwtsecret
+        target: /config/jwtsecret
+    ports:
+      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host 7002
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+      - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+      - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+    env_file:
+      - .env
