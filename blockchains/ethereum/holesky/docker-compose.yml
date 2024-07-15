@@ -1,13 +1,15 @@
 volumes:
   geth_data:
+    name: holesky_geth_data
   prysm_data:
-
+    name: holesky_prysm_data
 
 services:
-  geth:
+  holesky-el-geth:
     build:
       context: ../../../clients/geth
       dockerfile: Dockerfile
+    container_name: holesky-el-geth
     command: [ "/app/geth-entrypoint.sh" ]
     volumes:
       - geth_data:/data
@@ -23,10 +25,11 @@ services:
     env_file:
       - .env
 
-  beacon-node:
+  holesky-cl-prysm-beacon-node:
     build:
       context: ../../../clients/prysm
       dockerfile: Dockerfile
+    container_name: holesky-cl-prysm-beacon-node
     command: [ "/app/beacon-node-entrypoint.sh" ]
     volumes:
       - prysm_data:/data
