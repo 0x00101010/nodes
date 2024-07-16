@@ -44,3 +44,34 @@ services:
       - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
     env_file:
       - .env
+
+  holesky-cl-prysm-validator:
+    build:
+      context: ../../../clients/prysm
+      dockerfile: Dockerfile
+    container_name: holesky-cl-prysm-validator
+    command: [ "/app/validator-entrypoint.sh" ]
+    depends_on:
+      holesky-cl-prysm-validator-account-import:
+        condition: service_completed_successfully
+    volumes:
+      - prysm_data:/data
+      - ./validator_keys:/app/validator_keys # set your own key path
+      - ./passwd/wallet-passwd:/config/wallet-passwd # remember to set your passwd
+    env_file:
+      - .env
+
+  # importing accounts for validator
+  holesky-cl-prysm-validator-account-import:
+    build:
+      context: ../../../clients/prysm
+      dockerfile: Dockerfile
+    container_name: holesky-cl-prysm-validator-account-import
+    command: [ "/app/validator-import-accounts.sh" ]
+    volumes:
+      - prysm_data:/data
+      - ./validator_keys:/config/validator_keys
+      - ./passwd/wallet-passwd:/config/wallet-passwd # remember to set your passwd
+      - ./passwd/keystore-passwd:/config/keystore-passwd # remember to set your passwd
+    env_file:
+      - .env

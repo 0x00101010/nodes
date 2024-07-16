@@ -60,3 +60,4 @@ COPY --from=builder /build/beacon-node  /app/
 COPY --from=builder /build/validator    /app/
 COPY ./beacon-node-entrypoint.sh        /app/
 COPY ./validator-entrypoint.sh          /app/
+COPY ./validator-import-accounts.sh     /app/
