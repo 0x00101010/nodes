@@ -6,13 +6,13 @@ volumes:
 services:
   geth:
     build:
-      context: ../../../clients/geth
+      context: ../../../services/geth
       dockerfile: Dockerfile
     command: [ "/app/geth-entrypoint.sh" ]
     volumes:
       - geth_data:/data
       - type: bind
-        source: ../../../clients/shared/jwtsecret
+        source: ../../../services/shared/jwtsecret
         target: /config/jwtsecret
     ports:
       - "${GETH_RPC_PORT}:${GETH_RPC_PORT}" # json rpc
@@ -25,13 +25,13 @@ services:
 
   beacon-node:
     build:
-      context: ../../../clients/prysm
+      context: ../../../services/prysm
       dockerfile: Dockerfile
     command: [ "/app/beacon-node-entrypoint.sh" ]
     volumes:
       - prysm_data:/data
       - type: bind
-        source: ../../../clients/shared/jwtsecret
+        source: ../../../services/shared/jwtsecret
         target: /config/jwtsecret
     ports:
       - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host 7002
