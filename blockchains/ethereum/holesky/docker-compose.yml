@@ -3,6 +3,8 @@ volumes:
     name: holesky_geth_data
   prysm_data:
     name: holesky_prysm_data
+  prometheus_data:
+    name: holesky_prometheus_data
 
 services:
   holesky-el-geth:
@@ -37,7 +39,7 @@ services:
         source: ../../../services/shared/jwtsecret
         target: /config/jwtsecret
     ports:
-      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host 7002
+      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
       - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
       - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
       - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
@@ -58,6 +60,8 @@ services:
       - prysm_data:/data
       - ./validator_keys:/app/validator_keys # set your own key path
       - ./passwd/wallet-passwd:/config/wallet-passwd # remember to set your passwd
+    ports:
+      - "${VALIDATOR_METRICS_PORT}:${VALIDATOR_METRICS_PORT}"
     env_file:
       - .env
 
@@ -82,5 +86,9 @@ services:
       dockerfile: Dockerfile
     container_name: holesky-prometheus
     command: [ "/app/prometheus-entrypoint.sh" ]
+    volumes:
+      - prometheus_data:/data
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
     env_file:
       - .env
