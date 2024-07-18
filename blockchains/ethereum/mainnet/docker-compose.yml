@@ -15,11 +15,11 @@ services:
         source: ../../../services/shared/jwtsecret
         target: /config/jwtsecret
     ports:
-      - "${GETH_RPC_PORT}:${GETH_RPC_PORT}" # json rpc
-      - "${GETH_WS_PORT}:${GETH_WS_PORT}" # ws rpc
-      - "${GETH_METRICS_PORT}:${GETH_METRICS_PORT}" # prometheus at host 7001
-      - "${GETH_P2P_PORT}:${GETH_P2P_PORT}" # p2p
-      - "${GETH_P2P_PORT}:${GETH_P2P_PORT}/udp" # p2p udp
+      - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
+      - "${EL_WS_PORT}:${EL_WS_PORT}" # ws rpc
+      - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}" # p2p
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}/udp" # p2p udp
     env_file:
       - .env
 
