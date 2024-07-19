@@ -9,6 +9,10 @@ VALIDATOR_RPC_PROVIDER="$CL_BEACON_NODE_DNS:$BEACON_NODE_RPC_PORT"
 
 ADDITIONAL_ARGS=""
 
+if [ -n "$MEV_BOOST_DNS" ] && [ -n "$MEV_BOOST_PORT" ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --enable-builder"
+fi
+
 ./validator \
     --accept-terms-of-use \
     --$NETWORK \
