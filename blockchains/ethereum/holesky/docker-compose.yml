@@ -5,6 +5,8 @@ volumes:
     name: holesky_prysm_data
   prometheus_data:
     name: holesky_prometheus_data
+  grafana_data:
+    name: holesky_grafana_data
 
 services:
   holesky-el-geth:
@@ -90,5 +92,19 @@ services:
       - prometheus_data:/data
     ports:
       - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    env_file:
+      - .env
+
+  holesky-grafana:
+    build:
+      context: ../../../services/grafana
+      dockerfile: Dockerfile
+    container_name: holesky-grafana
+    command: [ "/app/grafana-entrypoint.sh" ]
+    volumes:
+      - grafana_data:/data
+      - ./passwd/grafana-admin-passwd:/config/grafana-admin-passwd # remember to set your passwd
+    ports:
+      - "${GF_SERVER_HTTP_PORT}:${GF_SERVER_HTTP_PORT}"
     env_file:
       - .env
