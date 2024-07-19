@@ -9,14 +9,16 @@ RUN apt update && \
     wget \
     build-essential
 
-ENV PROMETHEUS_VERSION=2.53.1
-ENV NAME="prometheus-$PROMETHEUS_VERSION.linux-amd64"
-ENV URL="https://github.com/prometheus/prometheus/releases/download/v$PROMETHEUS_VERSION/$NAME.tar.gz"
+ENV OS_ARCH=linux-amd64
+ENV VERSION=2.53.1
+ENV NAME="prometheus-$VERSION.$OS_ARCH"
+ENV URL="https://github.com/prometheus/prometheus/releases/download/v$VERSION/$NAME.tar.gz"
 
 RUN wget $URL
 RUN tar -xf $NAME.tar.gz
 RUN mv $NAME/prometheus .
 
+# execution environment
 FROM ubuntu:24.04
 
 WORKDIR /app
