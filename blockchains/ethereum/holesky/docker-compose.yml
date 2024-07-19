@@ -17,9 +17,7 @@ services:
     command: [ "/app/geth-entrypoint.sh" ]
     volumes:
       - geth_data:/data
-      - type: bind
-        source: ../../../services/shared/jwtsecret
-        target: /config/jwtsecret
+      - ./secrets/jwtsecret:/config/jwtsecret
     ports:
       - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
       - "${EL_WS_PORT}:${EL_WS_PORT}" # ws rpc
@@ -37,9 +35,7 @@ services:
     command: [ "/app/beacon-node-entrypoint.sh" ]
     volumes:
       - prysm_data:/data
-      - type: bind
-        source: ../../../services/shared/jwtsecret
-        target: /config/jwtsecret
+      - ./secrets/jwtsecret:/config/jwtsecret
     ports:
       - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
       - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
