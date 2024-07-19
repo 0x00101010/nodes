@@ -1,13 +1,19 @@
 volumes:
   geth_data:
+    name: mainnet_geth_data
   prysm_data:
-
+    name: mainnet_prysm_data
+  prometheus_data:
+    name: mainnet_prometheus_data
+  grafana_data:
+    name: mainnet_grafana_data
 
 services:
-  geth:
+  mainnet-el-geth:
     build:
       context: ../../../services/geth
       dockerfile: Dockerfile
+    container_name: mainnet-el-geth
     command: [ "/app/geth-entrypoint.sh" ]
     volumes:
       - geth_data:/data
@@ -23,10 +29,11 @@ services:
     env_file:
       - .env
 
-  beacon-node:
+  mainnet-cl-prysm-beacon-node:
     build:
       context: ../../../services/prysm
       dockerfile: Dockerfile
+    container_name: mainnet-cl-prysm-beacon-node
     command: [ "/app/beacon-node-entrypoint.sh" ]
     volumes:
       - prysm_data:/data
@@ -34,10 +41,87 @@ services:
         source: ../../../services/shared/jwtsecret
         target: /config/jwtsecret
     ports:
-      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host 7002
+      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
       - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
       - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
       - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
       - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+    env_file:
+      - .env
+
+  mainnet-cl-prysm-validator:
+    build:
+      context: ../../../services/prysm
+      dockerfile: Dockerfile
+    container_name: mainnet-cl-prysm-validator
+    command: [ "/app/validator-entrypoint.sh" ]
+    depends_on:
+      mainnet-cl-prysm-validator-account-import:
+        condition: service_completed_successfully
+    volumes:
+      - prysm_data:/data
+      - ./validator_keys:/app/validator_keys # set your own key path
+      - ./passwd/wallet-passwd:/config/wallet-passwd # remember to set your passwd
+    ports:
+      - "${VALIDATOR_METRICS_PORT}:${VALIDATOR_METRICS_PORT}"
+    env_file:
+      - .env
+
+  # importing accounts for validator
+  mainnet-cl-prysm-validator-account-import:
+    build:
+      context: ../../../services/prysm
+      dockerfile: Dockerfile
+    container_name: mainnet-cl-prysm-validator-account-import
+    command: [ "/app/validator-import-accounts.sh" ]
+    volumes:
+      - prysm_data:/data
+      - ./validator_keys:/config/validator_keys
+      - ./passwd/wallet-passwd:/config/wallet-passwd # remember to set your passwd
+      - ./passwd/keystore-passwd:/config/keystore-passwd # remember to set your passwd
+    env_file:
+      - .env
+
+  mainnet-prometheus:
+    build:
+      context: ../../../services/prometheus
+      dockerfile: Dockerfile
+    container_name: mainnet-prometheus
+    command: [ "/app/prometheus-entrypoint.sh" ]
+    volumes:
+      - prometheus_data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    env_file:
+      - .env
+
+  mainnet-grafana:
+    build:
+      context: ../../../services/grafana
+      dockerfile: Dockerfile
+    container_name: mainnet-grafana
+    command: [ "/app/grafana-entrypoint.sh" ]
+    volumes:
+      - grafana_data:/data
+      - ./passwd/grafana-admin-passwd:/config/grafana-admin-passwd # remember to set your passwd
+    ports:
+      - "${GF_SERVER_HTTP_PORT}:${GF_SERVER_HTTP_PORT}"
+    env_file:
+      - .env
+
+  # this is shared across multiple files and should only start once
+  prometheus-node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    container_name: prometheus-node-exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--web.listen-address=0.0.0.0:${PROMETHEUS_NODE_EXPORTER_PORT}'
+    network_mode: host
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
     env_file:
       - .env
