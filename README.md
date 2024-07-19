@@ -16,4 +16,10 @@ sudo ufw reload
 
 ### Setup a new network
 
-1. Generate validator_keys
+*. generate jwt token
+`openssl rand -hex 32 | tr -d "\n" > jwtsecret`
+
+*. Generate validator_keys
+`./deposit new-mnemonic --num_validators=<validator number> --mnemonic_language=english --chain=<network> --execution_address=<withdrawal address>`
+
+*. Create passwords files

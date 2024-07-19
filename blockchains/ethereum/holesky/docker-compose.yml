@@ -106,18 +106,3 @@ services:
       - "${GF_SERVER_HTTP_PORT}:${GF_SERVER_HTTP_PORT}"
     env_file:
       - .env
-
-  # this is shared across multiple files and should only start once
-  prometheus-node-exporter:
-    image: quay.io/prometheus/node-exporter:v1.8.2
-    container_name: prometheus-node-exporter
-    command:
-      - '--path.rootfs=/host'
-      - '--web.listen-address=0.0.0.0:${PROMETHEUS_NODE_EXPORTER_PORT}'
-    network_mode: host
-    pid: host
-    restart: unless-stopped
-    volumes:
-      - '/:/host:ro,rslave'
-    env_file:
-      - .env
