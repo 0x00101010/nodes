@@ -61,7 +61,7 @@ services:
     volumes:
       - prysm_data:/data
       - ./validator_keys:/app/validator_keys # set your own key path
-      - ./passwd/wallet-passwd:/config/wallet-passwd # remember to set your passwd
+      - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
     ports:
       - "${VALIDATOR_METRICS_PORT}:${VALIDATOR_METRICS_PORT}"
     env_file:
@@ -77,8 +77,8 @@ services:
     volumes:
       - prysm_data:/data
       - ./validator_keys:/config/validator_keys
-      - ./passwd/wallet-passwd:/config/wallet-passwd # remember to set your passwd
-      - ./passwd/keystore-passwd:/config/keystore-passwd # remember to set your passwd
+      - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+      - ./secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
     env_file:
       - .env
 
@@ -105,7 +105,7 @@ services:
     command: [ "/app/grafana-entrypoint.sh" ]
     volumes:
       - grafana_data:/data
-      - ./passwd/grafana-admin-passwd:/config/grafana-admin-passwd # remember to set your passwd
+      - ./secrets/grafana-admin-pwd:/config/grafana-admin-pwd # remember to set your passwd
     ports:
       - "${GF_SERVER_HTTP_PORT}:${GF_SERVER_HTTP_PORT}"
     env_file:

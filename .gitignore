@@ -1,3 +1,3 @@
 validator_keys/
-passwd/
+secrets/
 .env.local
