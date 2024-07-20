@@ -1,12 +1,16 @@
 volumes:
   geth_data:
     name: holesky_geth_data
+    external: true
   prysm_data:
     name: holesky_prysm_data
+    external: true
   prometheus_data:
     name: holesky_prometheus_data
+    external: true
   grafana_data:
     name: holesky_grafana_data
+    external: true
 
 services:
   holesky-el-geth:
