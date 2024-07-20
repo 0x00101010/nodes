@@ -15,6 +15,7 @@ services:
       dockerfile: Dockerfile
     container_name: holesky-el-geth
     command: [ "/app/geth-entrypoint.sh" ]
+    restart: unless-stopped
     volumes:
       - geth_data:/data
       - ./secrets/jwtsecret:/config/jwtsecret
@@ -33,6 +34,7 @@ services:
       dockerfile: Dockerfile
     container_name: holesky-cl-prysm-beacon-node
     command: [ "/app/beacon-node-entrypoint.sh" ]
+    restart: unless-stopped
     volumes:
       - prysm_data:/data
       - ./secrets/jwtsecret:/config/jwtsecret
@@ -51,6 +53,7 @@ services:
       dockerfile: Dockerfile
     container_name: holesky-cl-prysm-validator
     command: [ "/app/validator-entrypoint.sh" ]
+    restart: unless-stopped
     depends_on:
       holesky-cl-prysm-validator-account-import:
         condition: service_completed_successfully
@@ -84,6 +87,7 @@ services:
       dockerfile: Dockerfile
     container_name: holesky-prometheus
     command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
     volumes:
       - prometheus_data:/data
     extra_hosts:
@@ -99,6 +103,7 @@ services:
       dockerfile: Dockerfile
     container_name: holesky-grafana
     command: [ "/app/grafana-entrypoint.sh" ]
+    restart: unless-stopped
     volumes:
       - grafana_data:/data
       - ./secrets/grafana-admin-pwd:/config/grafana-admin-pwd # remember to set your passwd
@@ -122,6 +127,7 @@ services:
       - "https://0x821f2a65afb70e7f2e820a925a9b4c80a159620582c1766b1b09729fec178b11ea22abb3a51f07b288be815a1a2ff516@bloxroute.holesky.blxrbdn.com"
       - "-relay"
       - "https://0xab78bf8c781c58078c3beb5710c57940874dd96aef2835e7742c866b4c7c0406754376c2c8285a36c630346aa5c5f833@holesky.aestus.live"
+    restart: unless-stopped
     ports:
       - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
     env_file:

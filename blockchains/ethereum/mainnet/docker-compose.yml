@@ -15,6 +15,7 @@ services:
       dockerfile: Dockerfile
     container_name: mainnet-el-geth
     command: [ "/app/geth-entrypoint.sh" ]
+    restart: unless-stopped
     volumes:
       - geth_data:/data
       - ./secrets/jwtsecret:/config/jwtsecret
@@ -33,6 +34,7 @@ services:
       dockerfile: Dockerfile
     container_name: mainnet-cl-prysm-beacon-node
     command: [ "/app/beacon-node-entrypoint.sh" ]
+    restart: unless-stopped
     volumes:
       - prysm_data:/data
       - ./secrets/jwtsecret:/config/jwtsecret
@@ -51,6 +53,7 @@ services:
       dockerfile: Dockerfile
     container_name: mainnet-cl-prysm-validator
     command: [ "/app/validator-entrypoint.sh" ]
+    restart: unless-stopped
     depends_on:
       mainnet-cl-prysm-validator-account-import:
         condition: service_completed_successfully
@@ -84,6 +87,7 @@ services:
       dockerfile: Dockerfile
     container_name: mainnet-prometheus
     command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
     volumes:
       - prometheus_data:/data
     extra_hosts:
@@ -99,6 +103,7 @@ services:
       dockerfile: Dockerfile
     container_name: mainnet-grafana
     command: [ "/app/grafana-entrypoint.sh" ]
+    restart: unless-stopped
     volumes:
       - grafana_data:/data
       - ./secrets/grafana-admin-pwd:/config/grafana-admin-pwd # remember to set your passwd
@@ -118,6 +123,7 @@ services:
       - "https://0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200f2f8e2e3ad3b71d3499c54ad14d6c21b41a37ae@boost-relay.flashbots.net"
       - "-relay"
       - "https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money"
+    restart: unless-stopped
     ports:
       - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
     env_file:
