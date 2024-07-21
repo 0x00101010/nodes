@@ -8,8 +8,8 @@ All staking related configurations
 
 Need to allow it from ufw:
 ```shell
-docker network ls
-docker network inspect <network name>
+docker network create shared_network
+docker network inspect shared_network
 sudo ufw allow from <IPAM Subnet, example 172.17.0.0/16> to any port 9100
 sudo ufw reload
 ```
