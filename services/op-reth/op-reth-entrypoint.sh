@@ -14,6 +14,12 @@ if [[ -z "$RETH_CHAIN" ]]; then
     exit 1
 fi
 
+ADDITIONAL_ARGS=""
+
+if [ "${RETH_GCMODE:-archive}" = "full" ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --full"
+fi
+
 exec ./op-reth \
     node \
     -vvv \
@@ -36,5 +42,6 @@ exec ./op-reth \
     --chain "$RETH_CHAIN" \
     --disable-discovery \
     --rollup.sequencer-http "$RETH_SEQUENCER_HTTP" \
-    --rollup.disable-tx-pool-gossip
+    --rollup.disable-tx-pool-gossip \
+    $ADDITIONAL_ARGS
 
