@@ -12,6 +12,10 @@ volumes:
     name: holesky_grafana_data
     external: true
 
+networks:
+  shared_network:
+    external: true
+
 services:
   holesky-el-geth:
     build:
@@ -29,6 +33,8 @@ services:
       - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
       - "${EL_P2P_PORT}:${EL_P2P_PORT}" # p2p
       - "${EL_P2P_PORT}:${EL_P2P_PORT}/udp" # p2p udp
+    networks:
+      - shared_network
     env_file:
       - .env
 
@@ -48,6 +54,8 @@ services:
       - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
       - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
       - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+    networks:
+      - shared_network
     env_file:
       - .env
 
@@ -67,6 +75,8 @@ services:
       - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
     ports:
       - "${VALIDATOR_METRICS_PORT}:${VALIDATOR_METRICS_PORT}"
+    networks:
+      - shared_network
     env_file:
       - .env
 
@@ -82,6 +92,8 @@ services:
       - ./validator_keys:/config/validator_keys
       - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
       - ./secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
+    networks:
+      - shared_network
     env_file:
       - .env
 
@@ -98,6 +110,8 @@ services:
       - "host.docker.internal:host-gateway"
     ports:
       - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    networks:
+      - shared_network
     env_file:
       - .env
 
@@ -113,6 +127,8 @@ services:
       - ./secrets/grafana-admin-pwd:/config/grafana-admin-pwd # remember to set your passwd
     ports:
       - "${GF_SERVER_HTTP_PORT}:${GF_SERVER_HTTP_PORT}"
+    networks:
+      - shared_network
     env_file:
       - .env
 
@@ -134,5 +150,7 @@ services:
     restart: unless-stopped
     ports:
       - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
+    networks:
+      - shared_network
     env_file:
       - .env
