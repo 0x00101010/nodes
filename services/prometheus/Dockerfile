@@ -31,4 +31,5 @@ RUN apt update && \
 
 COPY --from=builder /app/prometheus     /app/
 COPY ./prometheus-entrypoint.sh         /app/
-COPY ./prometheus-config-template.yml   /app/
+COPY ./ethereum-config-template.yml     /app/
+COPY ./base-config-template.yml         /app/

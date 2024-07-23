@@ -2,6 +2,8 @@ volumes:
   reth_data:
     name: base_mainnet_reth_data
     external: true
+  prometheus_data:
+    name: base_mainnet_prometheus_data
 
 networks:
   shared_network:
@@ -41,6 +43,22 @@ services:
       - "${OP_NODE_METRICS_PORT}:${OP_NODE_METRICS_PORT}"
       - "${OP_NODE_P2P_LISTEN_TCP_PORT}:${OP_NODE_P2P_LISTEN_TCP_PORT}"
       - "${OP_NODE_P2P_LISTEN_UDP_PORT}:${OP_NODE_P2P_LISTEN_UDP_PORT}/udp"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  base-mainnet-prometheus:
+    build:
+      context: ../../../services/prometheus
+      dockerfile: Dockerfile
+    container_name: base-mainnet-prometheus
+    command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/data
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
     networks:
       - shared_network
     env_file:
