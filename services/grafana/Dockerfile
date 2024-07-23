@@ -28,7 +28,7 @@ RUN apt update && \
     gettext
 
 COPY --from=builder /app/grafana    /app/grafana
-COPY ./provisioning/                /app/grafana/conf/provisioning/
-COPY ./dashboards/                  /app/dashboards/
 COPY ./grafana-entrypoint.sh        /app/
 COPY ./grafana-config.ini           /app/
+# COPY ./provisioning/                /app/grafana/conf/provisioning/
+# COPY ./dashboards/                  /app/dashboards/

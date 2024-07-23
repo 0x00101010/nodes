@@ -8,9 +8,6 @@ volumes:
   prometheus_data:
     name: mainnet_prometheus_data
     external: true
-  grafana_data:
-    name: mainnet_grafana_data
-    external: true
 
 networks:
   shared_network:
@@ -110,23 +107,6 @@ services:
       - "host.docker.internal:host-gateway"
     ports:
       - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
-    networks:
-      - shared_network
-    env_file:
-      - .env
-
-  mainnet-grafana:
-    build:
-      context: ../../../services/grafana
-      dockerfile: Dockerfile
-    container_name: mainnet-grafana
-    command: [ "/app/grafana-entrypoint.sh" ]
-    restart: unless-stopped
-    volumes:
-      - grafana_data:/data
-      - ./secrets/grafana-admin-pwd:/config/grafana-admin-pwd # remember to set your passwd
-    ports:
-      - "${GF_SERVER_HTTP_PORT}:${GF_SERVER_HTTP_PORT}"
     networks:
       - shared_network
     env_file:
