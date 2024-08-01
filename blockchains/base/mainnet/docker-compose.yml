@@ -1,7 +1,6 @@
 volumes:
   reth_data:
     name: base_mainnet_reth_data
-    external: true
   prometheus_data:
     name: base_mainnet_prometheus_data
 
@@ -24,6 +23,8 @@ services:
       - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
       - "${EL_WS_PORT}:${EL_WS_PORT}" # ws rpc
       - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
+      - "${EL_AUTHRPC_PORT}:${EL_AUTHRPC_PORT}"
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}"
     networks:
       - shared_network
     env_file:
