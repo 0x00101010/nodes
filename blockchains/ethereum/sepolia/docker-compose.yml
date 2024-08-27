@@ -1,13 +1,14 @@
-# volumes:
-#   geth_data:
-#     name: sepolia_geth_data
-#     external: true
-#   prysm_data:
-#     name: sepolia_prysm_data
-#     external: true
-#   prometheus_data:
-#     name: sepolia_prometheus_data
-#     external: true
+volumes:
+  geth_data:
+    name: sepolia_geth_data
+  reth_data:
+    name: sepolia_reth_data
+  lighthouse_data:
+    name: sepolia_lighthouse_data
+  prysm_data:
+    name: sepolia_prysm_data
+  prometheus_data:
+    name: sepolia_prometheus_data
 
 networks:
   shared_network:
@@ -22,7 +23,7 @@ services:
     command: [ "/app/reth-entrypoint.sh" ]
     restart: unless-stopped
     volumes:
-      - /data/sepolia/l1/reth_data:/data
+      - reth_data:/data
       - ./secrets/jwtsecret:/config/jwtsecret
     ports:
       - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
@@ -34,17 +35,17 @@ services:
       - shared_network
     env_file:
       - .env
-
-  sepolia-cl-prysm-beacon-node:
+  
+  sepolia-cl-lighthouse-beacon-node:
     build:
-      context: ../../../services/prysm
+      context: ../../../services/lighthouse
       dockerfile: Dockerfile
-    container_name: sepolia-cl-prysm-beacon-node
+    container_name: sepolia-cl-lighthouse-beacon-node
     command: [ "/app/beacon-node-entrypoint.sh" ]
     restart: unless-stopped
     volumes:
-      - /data/sepolia/l1/prysm_data:/data
-      - ./secrets/jwtsecret:/config/jwtsecret
+      - lighthouse_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret  
     ports:
       - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
       - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
@@ -55,6 +56,27 @@ services:
       - shared_network
     env_file:
       - .env
+
+  # sepolia-cl-prysm-beacon-node:
+  #   build:
+  #     context: ../../../services/prysm
+  #     dockerfile: Dockerfile
+  #   container_name: sepolia-cl-prysm-beacon-node
+  #   command: [ "/app/beacon-node-entrypoint.sh" ]
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /data/sepolia/l1/prysm_data:/data
+  #     - ./secrets/jwtsecret:/config/jwtsecret
+  #   ports:
+  #     - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
+  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+  #     - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+  #     - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
     
   sepolia-prometheus:
     build:
@@ -64,7 +86,7 @@ services:
     command: [ "/app/prometheus-entrypoint.sh" ]
     restart: unless-stopped
     volumes:
-      - /data/sepolia/l1/prometheus_data:/data
+      - prometheus_data:/data
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:

@@ -1,6 +1,6 @@
 global:
   scrape_interval:     5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 55s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  evaluation_interval: 60s # Evaluate rules every 15 seconds. The default is every 1 minute.
   # scrape_timeout is set to the global default (10s).
 # Alertmanager configuration
 alerting:
@@ -15,20 +15,7 @@ rule_files:
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
 scrape_configs:
-  - job_name: "cl-beacon-node"
+  - job_name: 'node_exporter'
     static_configs:
-      - targets: ["$CL_BEACON_NODE_DNS:$BEACON_NODE_METRICS_PORT"]
-
-  - job_name: "cl-validator"
-    static_configs:
-      - targets: ["$CL_VALIDATOR_DNS:$VALIDATOR_METRICS_PORT"]
-
-  - job_name: "el-geth"
-    metrics_path: "/debug/metrics/prometheus"
-    static_configs:
-      - targets: ["$EL_DNS:$EL_METRICS_PORT"]
-
-  - job_name: "el-reth"
-    static_configs:
-      - targets: ["$EL_DNS:$EL_METRICS_PORT"]
+      - targets: ["host.docker.internal:$PROMETHEUS_NODE_EXPORTER_PORT"]
     

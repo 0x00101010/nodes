@@ -1,6 +1,8 @@
 volumes:
   grafana_data:
     name: grafana_data
+  prometheus_data:
+    name: prometheus_data
 
 networks:
   shared_network:
@@ -19,6 +21,24 @@ services:
     restart: unless-stopped
     volumes:
       - '/:/host:ro,rslave'
+
+  prometheus:
+    build:
+      context: ../prometheus
+      dockerfile: Dockerfile
+    container_name: prometheus
+    command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env
 
   grafana:
     build:
