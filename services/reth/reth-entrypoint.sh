@@ -15,13 +15,22 @@ if [[ -z "$RETH_CHAIN" ]]; then
     exit 1
 fi
 
+if [[ -z "$RETH_BIN" ]]; then
+    echo "expected RETH_BIN to be set" 1>&2
+    exit 1
+fi
+
 ADDITIONAL_ARGS=""
 
 if [ "${RETH_GCMODE:-archive}" = "full" ]; then
     ADDITIONAL_ARGS="$ADDITIONAL_ARGS --full"
 fi
 
-exec ./op-reth \
+if [ "${RETH_SEQUENCER_HTTP+x}" = x ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --rollup.sequencer-http $RETH_SEQUENCER_HTTP"
+fi
+
+exec ./$RETH_BIN \
     node \
     -vvv \
     --chain "$RETH_CHAIN" \
@@ -41,7 +50,6 @@ exec ./op-reth \
     --authrpc.port "$EL_AUTHRPC_PORT" \
     --authrpc.jwtsecret /config/jwtsecret \
     --metrics "0.0.0.0:$EL_METRICS_PORT" \
-    --rollup.sequencer-http "$RETH_SEQUENCER_HTTP" \
     --discovery.port "$EL_P2P_PORT" \
     --port "$EL_P2P_PORT" \
     # --disable-discovery \

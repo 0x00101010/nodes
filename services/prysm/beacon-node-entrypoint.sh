@@ -35,7 +35,7 @@ else
     exit 1
 fi
 
-if [ -n "$MEV_BOOST_DNS" ] && [ -n "$MEV_BOOST_PORT" ]; then
+if [ "${MEV_BOOST_DNS+x}" = x ] && [ "${MEV_BOOST_PORT+x}" = x ]; then
     ADDITIONAL_ARGS="$ADDITIONAL_ARGS --http-mev-relay=$MEV_BOOST_DNS:$MEV_BOOST_PORT"
 fi
 

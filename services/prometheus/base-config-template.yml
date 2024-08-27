@@ -19,7 +19,7 @@ scrape_configs:
     static_configs:
       - targets: ["$CL_DNS:$OP_NODE_METRICS_PORT"]
 
-  - job_name: "op-reth"
+  - job_name: "reth"
     static_configs:
       - targets: ["$EL_DNS:$EL_METRICS_PORT"]
     
