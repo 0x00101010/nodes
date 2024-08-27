@@ -1,8 +1,8 @@
-# volumes:
-#   reth_data:
-#     name: base_sepolia_reth_data
-#   prometheus_data:
-#     name: base_sepolia_prometheus_data
+volumes:
+  reth_data:
+    name: base_sepolia_reth_data
+  prometheus_data:
+    name: base_sepolia_prometheus_data
 
 networks:
   shared_network:
@@ -17,7 +17,7 @@ services:
     command: [ "/app/reth-entrypoint.sh" ]
     restart: unless-stopped
     volumes:
-      - /data/sepolia/l2/reth_data:/data
+      - reth_data:/data
       - ./secrets/jwtsecret:/config/jwtsecret
     ports:
       - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
@@ -57,7 +57,7 @@ services:
     command: [ "/app/prometheus-entrypoint.sh" ]
     restart: unless-stopped
     volumes:
-      - /data/sepolia/l2/prometheus_data:/data
+      - prometheus_data:/data
     ports:
       - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
     networks:
