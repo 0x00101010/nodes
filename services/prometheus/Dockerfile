@@ -34,3 +34,4 @@ COPY ./prometheus-entrypoint.sh         /app/
 COPY ./ethereum-config-template.yml     /app/
 COPY ./base-config-template.yml         /app/
 COPY ./host-config-template.yml         /app/
+COPY ./lighthouse-reth-template.yml     /app/
