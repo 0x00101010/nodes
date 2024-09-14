@@ -35,43 +35,63 @@ services:
     env_file:
       - .env
 
-  mainnet-cl-prysm-beacon-node:
+  # mainnet-cl-prysm-beacon-node:
+  #   build:
+  #     context: ../../../services/prysm
+  #     dockerfile: Dockerfile
+  #   container_name: mainnet-cl-prysm-beacon-node
+  #   command: [ "/app/beacon-node-entrypoint.sh" ]
+  #   restart: unless-stopped
+  #   volumes:
+  #     - prysm_data:/data
+  #     - ./secrets/jwtsecret:/config/jwtsecret
+  #   ports:
+  #     - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
+  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+  #     - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+  #     - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
+
+  # mainnet-cl-prysm-validator:
+  #   build:
+  #     context: ../../../services/prysm
+  #     dockerfile: Dockerfile
+  #   container_name: mainnet-cl-prysm-validator
+  #   command: [ "/app/validator-entrypoint.sh" ]
+  #   restart: unless-stopped
+  #   depends_on:
+  #     mainnet-cl-prysm-validator-account-import:
+  #       condition: service_completed_successfully
+  #   volumes:
+  #     - prysm_data:/data
+  #     - ./validator_keys:/app/validator_keys # set your own key path
+  #     - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+  #   ports:
+  #     - "${VALIDATOR_METRICS_PORT}:${VALIDATOR_METRICS_PORT}"
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
+  mainnet-cl-lighthouse-beacon-node:
     build:
-      context: ../../../services/prysm
+      context: ../../../services/lighthouse
       dockerfile: Dockerfile
-    container_name: mainnet-cl-prysm-beacon-node
+    container_name: mainnet-cl-lighthouse-beacon-node
     command: [ "/app/beacon-node-entrypoint.sh" ]
     restart: unless-stopped
     volumes:
-      - prysm_data:/data
-      - ./secrets/jwtsecret:/config/jwtsecret
+      - lighthouse_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret  
     ports:
       - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
       - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
       - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
       - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
       - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
-    networks:
-      - shared_network
-    env_file:
-      - .env
-
-  mainnet-cl-prysm-validator:
-    build:
-      context: ../../../services/prysm
-      dockerfile: Dockerfile
-    container_name: mainnet-cl-prysm-validator
-    command: [ "/app/validator-entrypoint.sh" ]
-    restart: unless-stopped
-    depends_on:
-      mainnet-cl-prysm-validator-account-import:
-        condition: service_completed_successfully
-    volumes:
-      - prysm_data:/data
-      - ./validator_keys:/app/validator_keys # set your own key path
-      - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
-    ports:
-      - "${VALIDATOR_METRICS_PORT}:${VALIDATOR_METRICS_PORT}"
     networks:
       - shared_network
     env_file:
