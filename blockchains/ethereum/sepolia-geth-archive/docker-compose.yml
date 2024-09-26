@@ -1,0 +1,93 @@
+volumes:
+  geth_data:
+    name: sepolia_geth_archive_data
+  prysm_data:
+    name: sepolia_prysm_archive_data
+  prometheus_data:
+    name: sepolia_prometheus_archive_data
+
+networks:
+  shared_network:
+    external: true
+
+services:
+  sepolia-el-geth-archive:
+    build:
+      context: ../../../services/geth
+      dockerfile: Dockerfile
+    container_name: sepolia-el-geth-archive
+    command: [ "/app/geth-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - geth_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
+      - "${EL_WS_PORT}:${EL_WS_PORT}" # ws rpc
+      - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}" # p2p
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}/udp" # p2p udp
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  # sepolia-cl-lighthouse-beacon-node-archive:
+  #   build:
+  #     context: ../../../services/lighthouse
+  #     dockerfile: Dockerfile
+  #   container_name: sepolia-cl-lighthouse-beacon-node-archive
+  #   command: [ "/app/beacon-node-entrypoint.sh" ]
+  #   restart: unless-stopped
+  #   volumes:
+  #     - lighthouse_data:/data
+  #     - ./secrets/jwtsecret:/config/jwtsecret
+  #   ports:
+  #     - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
+  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+  #     - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+  #     - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
+
+  sepolia-cl-prysm-beacon-node-archive:
+    build:
+      context: ../../../services/prysm
+      dockerfile: Dockerfile
+    container_name: sepolia-cl-prysm-beacon-node-archive
+    command: [ "/app/beacon-node-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prysm_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+      - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+      - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  sepolia-prometheus-archive:
+    build:
+      context: ../../../services/prometheus
+      dockerfile: Dockerfile
+    container_name: sepolia-prometheus-archive
+    command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env
