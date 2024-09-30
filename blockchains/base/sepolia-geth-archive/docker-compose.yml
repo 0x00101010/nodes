@@ -11,7 +11,7 @@ networks:
 services:
   base-sepolia-geth-archive:
     build:
-      context: ../../../services/geth
+      context: ../../../services/op-geth
       dockerfile: Dockerfile
     container_name: base-sepolia-geth-archive
     command: [ "/app/geth-entrypoint.sh" ]
