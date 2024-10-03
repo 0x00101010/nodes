@@ -32,7 +32,7 @@ RUN asdf plugin add golang && \
 
 # download source code
 ENV REPO=https://github.com/0x00101010/go-ethereum.git
-ENV COMMIT=8c56b357a2541bdde1a9e23b893b901ed91755b0
+ENV COMMIT=228cdf28beb72624a9c24bcdf06eac2cf18363d4
 RUN git init && \
     git remote add origin $REPO && \
     git fetch --depth 1 origin $COMMIT && \

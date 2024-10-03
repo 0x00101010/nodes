@@ -32,7 +32,7 @@ RUN asdf plugin add golang && \
 
 # download source code
 ENV REPO=https://github.com/0x00101010/op-geth.git
-ENV COMMIT=6da7cc2117fd615e93a7d13c6d309edde4cc7573
+ENV COMMIT=559acc0fde7328f0a8625ae876544115334e068e
 RUN git init && \
     git remote add origin $REPO && \
     git fetch --depth 1 origin $COMMIT && \
