@@ -18,7 +18,7 @@ RUN apt-get update && \
 #     git reset --hard FETCH_HEAD
 
 ENV REPO=https://github.com/0x00101010/reth.git
-ENV COMMIT=6b261db644f108fc2bd34e5450cb9457eeb3fddc
+ENV COMMIT=33e7f517f4b894517d67100041d1fac88e141418
 RUN git init && \
     git remote add origin $REPO && \
     git fetch --depth=1 origin $COMMIT && \
@@ -46,7 +46,7 @@ RUN apt-get update && \
 #     git reset --hard FETCH_HEAD
 
 ENV REPO=https://github.com/0x00101010/reth.git
-ENV COMMIT=6b261db644f108fc2bd34e5450cb9457eeb3fddc
+ENV COMMIT=33e7f517f4b894517d67100041d1fac88e141418
 RUN git init && \
     git remote add origin $REPO && \
     git fetch --depth=1 origin $COMMIT && \
