@@ -1,4 +1,4 @@
-FROM rust:1.81 AS reth-builder
+FROM rust:1.81 AS op-reth-builder
 WORKDIR /app
 
 RUN apt-get update && \
@@ -10,21 +10,15 @@ RUN apt-get update && \
     curl \
     build-essential
 
-ENV REPO=https://github.com/paradigmxyz/reth.git
-ENV COMMIT=fda6e353d51d42ec2d9e601dc63b82df892628de
+# ENV REPO=https://github.com/paradigmxyz/reth.git
+ENV REPO=https://github.com/0x00101010/reth.git
+ENV COMMIT=09e2ef238aae6dd666d1b67958014fec81791a5c
 RUN git init && \
     git remote add origin $REPO && \
     git fetch --depth=1 origin $COMMIT && \
     git reset --hard FETCH_HEAD
 
-# ENV REPO=https://github.com/0x00101010/reth.git
-# ENV COMMIT=f4a5f2c4b11a879560dd691feac17eb97a650593
-# RUN git init && \
-#     git remote add origin $REPO && \
-#     git fetch --depth=1 origin $COMMIT && \
-#     git reset --hard FETCH_HEAD
-
-RUN make build
+RUN make build-op
 
 FROM ubuntu:24.04
 WORKDIR /app
@@ -35,5 +29,5 @@ RUN apt-get update && \
     jq \
     iproute2
 
-COPY --from=reth-builder    /app/target/release/reth    /app/
+COPY --from=op-reth-builder /app/target/release/op-reth /app/
 COPY ./reth-entrypoint.sh                               /app/

@@ -11,7 +11,7 @@ networks:
 services:
   base-sepolia-reth:
     build:
-      context: ../../../services/reth
+      context: ../../../services/op-reth
       dockerfile: Dockerfile
     container_name: base-sepolia-reth
     command: [ "/app/reth-entrypoint.sh" ]
