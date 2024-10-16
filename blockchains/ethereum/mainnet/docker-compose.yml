@@ -4,7 +4,6 @@ volumes:
     external: true
   prysm_data:
     name: mainnet_prysm_data
-    external: true
   lighthouse_data:
     name: mainnet_lighthouse_data
   prometheus_data:
@@ -36,26 +35,26 @@ services:
     env_file:
       - .env
 
-  # mainnet-cl-prysm-beacon-node:
-  #   build:
-  #     context: ../../../services/prysm
-  #     dockerfile: Dockerfile
-  #   container_name: mainnet-cl-prysm-beacon-node
-  #   command: [ "/app/beacon-node-entrypoint.sh" ]
-  #   restart: unless-stopped
-  #   volumes:
-  #     - prysm_data:/data
-  #     - ./secrets/jwtsecret:/config/jwtsecret
-  #   ports:
-  #     - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
-  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
-  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
-  #     - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
-  #     - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
-  #   networks:
-  #     - shared_network
-  #   env_file:
-  #     - .env
+  mainnet-cl-prysm-beacon-node:
+    build:
+      context: ../../../services/prysm
+      dockerfile: Dockerfile
+    container_name: mainnet-cl-prysm-beacon-node
+    command: [ "/app/beacon-node-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prysm_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+      - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+      - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+    networks:
+      - shared_network
+    env_file:
+      - .env
 
   # mainnet-cl-prysm-validator:
   #   build:
@@ -77,26 +76,27 @@ services:
   #     - shared_network
   #   env_file:
   #     - .env
-  mainnet-cl-lighthouse-beacon-node:
-    build:
-      context: ../../../services/lighthouse
-      dockerfile: Dockerfile
-    container_name: mainnet-cl-lighthouse-beacon-node
-    command: [ "/app/beacon-node-entrypoint.sh" ]
-    restart: unless-stopped
-    volumes:
-      - lighthouse_data:/data
-      - ./secrets/jwtsecret:/config/jwtsecret
-    ports:
-      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
-      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
-      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
-      - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
-      - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
-    networks:
-      - shared_network
-    env_file:
-      - .env
+
+  # mainnet-cl-lighthouse-beacon-node:
+  #   build:
+  #     context: ../../../services/lighthouse
+  #     dockerfile: Dockerfile
+  #   container_name: mainnet-cl-lighthouse-beacon-node
+  #   command: [ "/app/beacon-node-entrypoint.sh" ]
+  #   restart: unless-stopped
+  #   volumes:
+  #     - lighthouse_data:/data
+  #     - ./secrets/jwtsecret:/config/jwtsecret
+  #   ports:
+  #     - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
+  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+  #     - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+  #     - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
 
   # importing accounts for validator
   mainnet-cl-prysm-validator-account-import:

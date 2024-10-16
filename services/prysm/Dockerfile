@@ -31,12 +31,15 @@ RUN asdf plugin add golang && \
     asdf global golang ${GO_VERSION}
 
 # download source code
+# ENV REPO=https://github.com/prysmaticlabs/prysm.git
+# ENV VERSION=v5.0.3
+# ENV COMMIT=38f208d70dc95b12c08403f5c72009aaa10dfe2f
+# RUN git clone $REPO --branch $VERSION --single-branch . && \
+#     git switch -c $VERSION && \
+#     bash -c '[ "$(git rev-parse HEAD)" = "$COMMIT" ]'
 ENV REPO=https://github.com/prysmaticlabs/prysm.git
-ENV VERSION=v5.0.3
-ENV COMMIT=38f208d70dc95b12c08403f5c72009aaa10dfe2f
-RUN git clone $REPO --branch $VERSION --single-branch . && \
-    git switch -c $VERSION && \
-    bash -c '[ "$(git rev-parse HEAD)" = "$COMMIT" ]'
+ENV BRANCH=get-blobs
+RUN git clone $REPO --branch $BRANCH --single-branch .
 
 # build
 # The flag below may be needed if blst throws SIGILL, which happens with certain (older) CPUs

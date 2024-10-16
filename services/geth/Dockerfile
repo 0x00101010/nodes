@@ -31,12 +31,16 @@ RUN asdf plugin add golang && \
     asdf global golang ${GO_VERSION}
 
 # download source code
-ENV REPO=https://github.com/ethereum/go-ethereum.git
-ENV VERSION=v1.14.7
-ENV COMMIT=aa55f5ea200dfd07618fdf658d9d2741c3b376a8
-RUN git clone $REPO --branch $VERSION --single-branch . && \
-    git switch -c $VERSION && \
-    bash -c '[ "$(git rev-parse HEAD)" = "$COMMIT" ]'
+# ENV REPO=https://github.com/ethereum/go-ethereum.git
+# ENV VERSION=v1.14.7
+# ENV COMMIT=aa55f5ea200dfd07618fdf658d9d2741c3b376a8
+# RUN git clone $REPO --branch $VERSION --single-branch . && \
+#     git switch -c $VERSION && \
+#     bash -c '[ "$(git rev-parse HEAD)" = "$COMMIT" ]'
+
+ENV REPO=https://github.com/karalabe/go-ethereum.git
+ENV BRANCH=get_blobs
+RUN git clone $REPO --branch $BRANCH --single-branch .
 
 # build
 RUN go mod tidy
