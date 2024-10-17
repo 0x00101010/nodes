@@ -1,7 +1,6 @@
 volumes:
   geth_data:
     name: mainnet_geth_data
-    external: true
   prysm_data:
     name: mainnet_prysm_data
   lighthouse_data:
@@ -133,21 +132,21 @@ services:
     env_file:
       - .env
 
-  mainnet-mev-boost:
-    image: flashbots/mev-boost:1.7.1
-    container_name: mainnet-mev-boost
-    command:
-      - "-$NETWORK"
-      - "-addr=0.0.0.0:$MEV_BOOST_PORT"
-      - "-relay-check"
-      - "-relay"
-      - "https://0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200f2f8e2e3ad3b71d3499c54ad14d6c21b41a37ae@boost-relay.flashbots.net"
-      - "-relay"
-      - "https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money"
-    restart: unless-stopped
-    ports:
-      - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
-    networks:
-      - shared_network
-    env_file:
-      - .env
+  # mainnet-mev-boost:
+  #   image: flashbots/mev-boost:1.7.1
+  #   container_name: mainnet-mev-boost
+  #   command:
+  #     - "-$NETWORK"
+  #     - "-addr=0.0.0.0:$MEV_BOOST_PORT"
+  #     - "-relay-check"
+  #     - "-relay"
+  #     - "https://0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200f2f8e2e3ad3b71d3499c54ad14d6c21b41a37ae@boost-relay.flashbots.net"
+  #     - "-relay"
+  #     - "https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money"
+  #   restart: unless-stopped
+  #   ports:
+  #     - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
