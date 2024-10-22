@@ -14,9 +14,9 @@ RUN apt update && \
     libclang-dev \
     clang
 
-ENV REPO=https://github.com/sigp/lighthouse.git
-ENV COMMIT=d6ba8c397557f5c977b70f0d822a9228e98ca214
-ENV VERSION=v5.3.0
+ENV REPO=https://github.com/jimmygchen/lighthouse.git
+ENV COMMIT=422fc1b6a5c79873ee179a28a7c4b45b404ac16b
+ENV VERSION=das-fetch-blobs
 RUN git clone $REPO --branch $VERSION --single-branch .
 RUN make
 

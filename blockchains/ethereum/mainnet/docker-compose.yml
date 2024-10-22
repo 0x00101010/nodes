@@ -26,6 +26,7 @@ services:
     ports:
       - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
       - "${EL_WS_PORT}:${EL_WS_PORT}" # ws rpc
+      - "${EL_AUTHRPC_PORT}:${EL_AUTHRPC_PORT}" # auth rpc
       - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
       - "${EL_P2P_PORT}:${EL_P2P_PORT}" # p2p
       - "${EL_P2P_PORT}:${EL_P2P_PORT}/udp" # p2p udp
@@ -34,26 +35,26 @@ services:
     env_file:
       - .env
 
-  mainnet-cl-prysm-beacon-node:
-    build:
-      context: ../../../services/prysm
-      dockerfile: Dockerfile
-    container_name: mainnet-cl-prysm-beacon-node
-    command: [ "/app/beacon-node-entrypoint.sh" ]
-    restart: unless-stopped
-    volumes:
-      - prysm_data:/data
-      - ./secrets/jwtsecret:/config/jwtsecret
-    ports:
-      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
-      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
-      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
-      - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
-      - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
-    networks:
-      - shared_network
-    env_file:
-      - .env
+  # mainnet-cl-prysm-beacon-node:
+  #   build:
+  #     context: ../../../services/prysm
+  #     dockerfile: Dockerfile
+  #   container_name: mainnet-cl-prysm-beacon-node
+  #   command: [ "/app/beacon-node-entrypoint.sh" ]
+  #   restart: unless-stopped
+  #   volumes:
+  #     - prysm_data:/data
+  #     - ./secrets/jwtsecret:/config/jwtsecret
+  #   ports:
+  #     - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
+  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+  #     - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+  #     - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
 
   # mainnet-cl-prysm-validator:
   #   build:
@@ -76,43 +77,43 @@ services:
   #   env_file:
   #     - .env
 
-  # mainnet-cl-lighthouse-beacon-node:
-  #   build:
-  #     context: ../../../services/lighthouse
-  #     dockerfile: Dockerfile
-  #   container_name: mainnet-cl-lighthouse-beacon-node
-  #   command: [ "/app/beacon-node-entrypoint.sh" ]
-  #   restart: unless-stopped
-  #   volumes:
-  #     - lighthouse_data:/data
-  #     - ./secrets/jwtsecret:/config/jwtsecret
-  #   ports:
-  #     - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
-  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
-  #     - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
-  #     - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
-  #     - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
-  #   networks:
-  #     - shared_network
-  #   env_file:
-  #     - .env
-
-  # importing accounts for validator
-  mainnet-cl-prysm-validator-account-import:
+  mainnet-cl-lighthouse-beacon-node:
     build:
-      context: ../../../services/prysm
+      context: ../../../services/lighthouse
       dockerfile: Dockerfile
-    container_name: mainnet-cl-prysm-validator-account-import
-    command: [ "/app/validator-import-accounts.sh" ]
+    container_name: mainnet-cl-lighthouse-beacon-node
+    command: [ "/app/beacon-node-entrypoint.sh" ]
+    restart: unless-stopped
     volumes:
-      - prysm_data:/data
-      - ./validator_keys:/config/validator_keys
-      - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
-      - ./secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
+      - lighthouse_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+      - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+      - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
     networks:
       - shared_network
     env_file:
       - .env
+
+  # importing accounts for validator
+  # mainnet-cl-prysm-validator-account-import:
+  #   build:
+  #     context: ../../../services/prysm
+  #     dockerfile: Dockerfile
+  #   container_name: mainnet-cl-prysm-validator-account-import
+  #   command: [ "/app/validator-import-accounts.sh" ]
+  #   volumes:
+  #     - prysm_data:/data
+  #     - ./validator_keys:/config/validator_keys
+  #     - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+  #     - ./secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
 
   mainnet-prometheus:
     build:

@@ -38,8 +38,8 @@ RUN asdf plugin add golang && \
 #     git switch -c $VERSION && \
 #     bash -c '[ "$(git rev-parse HEAD)" = "$COMMIT" ]'
 
-ENV REPO=https://github.com/karalabe/go-ethereum.git
-ENV BRANCH=get_blobs
+ENV REPO=https://github.com/ethereum/go-ethereum.git
+ENV BRANCH=master
 RUN git clone $REPO --branch $BRANCH --single-branch .
 
 # build
