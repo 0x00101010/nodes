@@ -1,13 +1,15 @@
 ARG BASE_IMAGE=ubuntu:24.04
-ARG ASDF_VERSION=v0.14.1
-ARG GO_VERSION=1.22.9
-ARG REPO=https://github.com/prysmaticlabs/prysm.git
-ARG VERSION=v1.14.12
-ARG COMMIT=293a300d64be3d9a1c2cc92c26fcff4089deadcd
+
 
 # building binaries
 FROM ${BASE_IMAGE} AS BUILDER
 WORKDIR /app
+
+ARG ASDF_VERSION=v0.14.1
+ARG GO_VERSION=1.22.9
+ARG REPO=https://github.com/prysmaticlabs/prysm.git
+ARG VERSION=v5.1.2
+ARG COMMIT=944f94a9bf6cbd19699b319917499fd7262e2f73
 
 # install dependencies
 RUN apt update && \
@@ -27,10 +29,12 @@ RUN apt update && \
     unzip \
     tzdata
 
+RUN echo "ASDF_VERSION=${ASDF_VERSION}"
+
 # install golang
 ENV ASDF_ROOT=/root/.asdf
 ENV PATH="${ASDF_ROOT}/bin:${ASDF_ROOT}/shims:$PATH"
-RUN git clone https://github.com/asdf-vm/asdf.git ${ASDF_ROOT} --branch ${ASDF_VERSION}
+RUN echo "ASDF_VERSION=${ASDF_VERSION}" && git clone https://github.com/asdf-vm/asdf.git ${ASDF_ROOT} --branch ${ASDF_VERSION}
 RUN asdf plugin add golang && \
     asdf install golang ${GO_VERSION} && \
     asdf global golang ${GO_VERSION}

@@ -1,12 +1,13 @@
 ARG BASE_IMAGE=ubuntu:24.04
-ARG ASDF_VERSION=v0.14.1
-ARG GO_VERSION=1.22.9
-ARG GETH_REPO=https://github.com/ethereum/go-ethereum.git
-ARG GETH_VERSION=v1.14.12
-ARG GETH_COMMIT=293a300d64be3d9a1c2cc92c26fcff4089deadcd
 
 FROM ${BASE_IMAGE} AS BUILDER
 WORKDIR /app
+
+ARG ASDF_VERSION=v0.14.1
+ARG GO_VERSION=1.22.9
+ARG REPO=https://github.com/ethereum/go-ethereum.git
+ARG VERSION=v1.14.12
+ARG COMMIT=293a300d64be3d9a1c2cc92c26fcff4089deadcd
 
 # install dependencies
 RUN apt update && \
@@ -36,8 +37,8 @@ RUN asdf plugin add golang && \
 
 # download and build from source code
 RUN git init && \
-    git remote add origin ${OP_GETH_REPO} && \
-    git fetch --depth 1 origin ${OP_GETH_COMMIT} && \
+    git remote add origin ${REPO} && \
+    git fetch --depth 1 origin ${COMMIT} && \
     git checkout FETCH_HEAD && \
     make geth
 
@@ -53,4 +54,4 @@ RUN apt-get update && \
 
 WORKDIR /app
 COPY --from=builder /app/build/bin/geth  /app/
-COPY ./geth-entrypoint.sh /app/
+COPY ./entrypoint.sh /app/

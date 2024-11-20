@@ -38,8 +38,10 @@ RUN asdf plugin add golang && \
 RUN git init && \
     git remote add origin ${OP_GETH_REPO} && \
     git fetch --depth 1 origin ${OP_GETH_COMMIT} && \
-    git checkout FETCH_HEAD && \
-    go run build/ci.go install -static ./cmd/geth
+    git checkout FETCH_HEAD
+
+RUN go mod tidy
+RUN go run build/ci.go install -static ./cmd/geth
 
 FROM ${BASE_IMAGE}
 WORKDIR /app
