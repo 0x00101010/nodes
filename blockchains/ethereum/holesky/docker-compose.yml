@@ -1,0 +1,136 @@
+volumes:
+  geth_data:
+    name: holesky_geth_data
+    external: true
+  prysm_data:
+    name: holesky_prysm_data
+    external: true
+  prometheus_data:
+    name: holesky_prometheus_data
+    external: true
+
+networks:
+  shared_network:
+    external: true
+
+services:
+  holesky-el-geth:
+    build:
+      context: ../../../services/geth
+      dockerfile: Dockerfile
+    container_name: holesky-el-geth
+    command: [ "/app/geth-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - geth_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
+      - "${EL_WS_PORT}:${EL_WS_PORT}" # ws rpc
+      - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}" # p2p
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}/udp" # p2p udp
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  holesky-cl-prysm-beacon-node:
+    build:
+      context: ../../../services/prysm
+      dockerfile: Dockerfile
+    container_name: holesky-cl-prysm-beacon-node
+    command: [ "/app/beacon-node-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prysm_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+      - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+      - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  holesky-cl-prysm-validator:
+    build:
+      context: ../../../services/prysm
+      dockerfile: Dockerfile
+    container_name: holesky-cl-prysm-validator
+    command: [ "/app/validator-entrypoint.sh" ]
+    restart: unless-stopped
+    depends_on:
+      holesky-cl-prysm-validator-account-import:
+        condition: service_completed_successfully
+    volumes:
+      - prysm_data:/data
+      - ./validator_keys:/app/validator_keys # set your own key path
+      - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+    ports:
+      - "${VALIDATOR_METRICS_PORT}:${VALIDATOR_METRICS_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  # importing accounts for validator
+  holesky-cl-prysm-validator-account-import:
+    build:
+      context: ../../../services/prysm
+      dockerfile: Dockerfile
+    container_name: holesky-cl-prysm-validator-account-import
+    command: [ "/app/validator-import-accounts.sh" ]
+    volumes:
+      - prysm_data:/data
+      - ./validator_keys:/config/validator_keys
+      - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+      - ./secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  holesky-prometheus:
+    build:
+      context: ../../../services/prometheus
+      dockerfile: Dockerfile
+    container_name: holesky-prometheus
+    command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  holesky-mev-boost:
+    image: flashbots/mev-boost:1.7.1
+    container_name: holesky-mev-boost
+    command:
+      - "-$NETWORK"
+      - "-addr=0.0.0.0:$MEV_BOOST_PORT"
+      - "-relay-check"
+      - "-relay"
+      - "https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net"
+      - "-relay"
+      - "https://0xb1559beef7b5ba3127485bbbb090362d9f497ba64e177ee2c8e7db74746306efad687f2cf8574e38d70067d40ef136dc@relay-stag.ultrasound.money"
+      - "-relay"
+      - "https://0x821f2a65afb70e7f2e820a925a9b4c80a159620582c1766b1b09729fec178b11ea22abb3a51f07b288be815a1a2ff516@bloxroute.holesky.blxrbdn.com"
+      - "-relay"
+      - "https://0xab78bf8c781c58078c3beb5710c57940874dd96aef2835e7742c866b4c7c0406754376c2c8285a36c630346aa5c5f833@holesky.aestus.live"
+    restart: unless-stopped
+    ports:
+      - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env

@@ -1,0 +1,78 @@
+volumes:
+  grafana_data:
+    name: shared_grafana_data
+  prometheus_data:
+    name: shared_prometheus_data
+
+networks:
+  shared_network:
+    external: true
+
+services:
+  # this is shared across multiple files and should only start once
+  prometheus-node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    container_name: prometheus-node-exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--web.listen-address=0.0.0.0:${PROMETHEUS_NODE_EXPORTER_PORT}'
+    network_mode: host
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+
+  prometheus:
+    build:
+      context: ../prometheus
+      dockerfile: Dockerfile
+    container_name: prometheus
+    command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  grafana:
+    build:
+      context: ../grafana
+      dockerfile: Dockerfile
+    container_name: grafana
+    command: [ "/app/grafana-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - grafana_data:/data
+      - ./secrets/grafana-admin-pwd:/config/grafana-admin-pwd # remember to set your passwd
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${GF_SERVER_HTTP_PORT}:${GF_SERVER_HTTP_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - "8080:8080"
+    networks:
+      - shared_network
+    restart: unless-stopped

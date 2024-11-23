@@ -1,0 +1,66 @@
+volumes:
+  reth_data:
+    name: base_mainnet_reth_data
+  prometheus_data:
+    name: base_mainnet_prometheus_data
+
+networks:
+  shared_network:
+    external: true
+
+services:
+  base-mainnet-reth:
+    build:
+      context: ../../../services/reth
+      dockerfile: Dockerfile
+    container_name: base-mainnet-reth
+    command: [ "/app/reth-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - reth_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
+      - "${EL_WS_PORT}:${EL_WS_PORT}" # ws rpc
+      - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
+      - "${EL_AUTHRPC_PORT}:${EL_AUTHRPC_PORT}"
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  base-mainnet-node:
+    build:
+      context: ../../../services/op-node
+      dockerfile: Dockerfile
+    container_name: base-mainnet-node
+    command: [ "/app/op-node-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${OP_NODE_RPC_PORT}:${OP_NODE_RPC_PORT}"
+      - "${OP_NODE_METRICS_PORT}:${OP_NODE_METRICS_PORT}"
+      - "${OP_NODE_P2P_LISTEN_TCP_PORT}:${OP_NODE_P2P_LISTEN_TCP_PORT}"
+      - "${OP_NODE_P2P_LISTEN_UDP_PORT}:${OP_NODE_P2P_LISTEN_UDP_PORT}/udp"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  base-mainnet-prometheus:
+    build:
+      context: ../../../services/prometheus
+      dockerfile: Dockerfile
+    container_name: base-mainnet-prometheus
+    command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/data
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env

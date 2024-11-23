@@ -1,0 +1,122 @@
+volumes:
+  geth_data:
+  prysm_data:
+  prometheus_data:
+
+networks:
+  shared_network:
+    external: true
+
+services:
+  geth:
+    build:
+      context: ../../../services/geth
+      dockerfile: Dockerfile
+    command: [ "/app/entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - geth_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
+      - "${EL_WS_PORT}:${EL_WS_PORT}" # ws rpc
+      - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}" # p2p
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}/udp" # p2p udp
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  beacon-node:
+    build:
+      context: ../../../services/prysm
+      dockerfile: Dockerfile
+    command: [ "/app/beacon-node-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prysm_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${BEACON_NODE_METRICS_PORT}:${BEACON_NODE_METRICS_PORT}" # prometheus at host
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}" # p2p
+      - "${BEACON_NODE_P2P_PORT}:${BEACON_NODE_P2P_PORT}/udp" # p2p
+      - "${BEACON_NODE_GRPC_PORT}:${BEACON_NODE_GRPC_PORT}" # grpc gateway port
+      - "${BEACON_NODE_RPC_PORT}:${BEACON_NODE_RPC_PORT}" # rpc port
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  prometheus:
+    build:
+      context: ../../../services/prometheus
+      dockerfile: Dockerfile
+    command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/data
+      - ./prometheus-template.yml:/app/prometheus-template.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  # cl-prysm-validator:
+  #   build:
+  #     context: ../../../services/prysm
+  #     dockerfile: Dockerfile
+  #   command: [ "/app/validator-entrypoint.sh" ]
+  #   restart: unless-stopped
+  #   depends_on:
+  #     mainnet-cl-prysm-validator-account-import:
+  #       condition: service_completed_successfully
+  #   volumes:
+  #     - prysm_data:/data
+  #     - ./validator_keys:/app/validator_keys # set your own key path
+  #     - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+  #   ports:
+  #     - "${VALIDATOR_METRICS_PORT}:${VALIDATOR_METRICS_PORT}"
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
+
+  # # importing accounts for validator
+  # mainnet-cl-prysm-validator-account-import:
+  #   build:
+  #     context: ../../../services/prysm
+  #     dockerfile: Dockerfile
+  #   container_name: mainnet-cl-prysm-validator-account-import
+  #   command: [ "/app/validator-import-accounts.sh" ]
+  #   volumes:
+  #     - prysm_data:/data
+  #     - ./validator_keys:/config/validator_keys
+  #     - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+  #     - ./secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
+
+  # mev-boost:
+  #   image: flashbots/mev-boost:1.8.0
+  #   command:
+  #     - "-$NETWORK"
+  #     - "-addr=0.0.0.0:$MEV_BOOST_PORT"
+  #     - "-relay-check"
+  #     - "-relay"
+  #     - "https://0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200f2f8e2e3ad3b71d3499c54ad14d6c21b41a37ae@boost-relay.flashbots.net"
+  #     - "-relay"
+  #     - "https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money"
+  #   restart: unless-stopped
+  #   ports:
+  #     - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env

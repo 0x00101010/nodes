@@ -1,0 +1,24 @@
+# Configuration file version
+apiVersion: 1
+
+deleteDatasources:
+  - name: $NETWORK-prometheus
+    orgId: 1
+
+# Mark provisioned data sources for deletion if they are no longer in a provisioning file.
+# It takes no effect if data sources are already listed in the deleteDatasources section.
+prune: true
+
+datasources:
+  - name: $NETWORK-prometheus
+    type: prometheus
+    access: proxy
+    orgId: 1
+    uid: $NETWORK-prometheus
+    url: http://$PROMETHEUS_DNS:$PROMETHEUS_PORT
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      cacheLevel: 'High'
+      disableRecordingRules: false

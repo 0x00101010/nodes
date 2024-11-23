@@ -1,0 +1,3 @@
+validator_keys/
+secrets/
+.env.local
