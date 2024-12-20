@@ -51,6 +51,7 @@ RUN git init && \
 RUN go mod tidy
 RUN go build -o /build/beacon-node  ./cmd/beacon-chain
 RUN go build -o /build/validator    ./cmd/validator
+RUN go build -o /build/prysmctl     ./cmd/prysmctl
 
 # runtime
 FROM ${BASE_IMAGE}
@@ -67,6 +68,7 @@ WORKDIR /app
 
 COPY --from=BUILDER /build/beacon-node  /app/
 COPY --from=BUILDER /build/validator    /app/
+COPY --from=BUILDER /build/prysmctl    /app/
 COPY ./beacon-node-entrypoint.sh        /app/
 COPY ./validator-entrypoint.sh          /app/
 COPY ./validator-import-accounts.sh     /app/
