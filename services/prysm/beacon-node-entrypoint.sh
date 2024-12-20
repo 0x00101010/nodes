@@ -4,7 +4,7 @@ set -eu
 # Logging verbosity. (trace, debug, info, warn, error, fatal, panic) (default: "info")
 BEACON_NODE_LOG_VERBOSITY="${BEACON_NODE_LOG_VERBOSITY:-info}"
 BEACON_NODE_DATA_DIR="${BEACON_NODE_DATA_DIR:-/data/beacon-node}"
-BEACON_NODE_ENABLE_UPNP="${BEACON_NODE_ENABLE_UPNP:-true}"
+BEACON_NODE_ENABLE_UPNP="${BEACON_NODE_ENABLE_UPNP:-false}"
 BEACON_NODE_EL_ENDPOINT="http://$EL_DNS:$EL_AUTHRPC_PORT"
 BEACON_NODE_METRICS_PORT="${BEACON_NODE_METRICS_PORT:-8080}"
 BEACON_NODE_P2P_PORT="${BEACON_NODE_P2P_PORT:-13000}"
@@ -20,8 +20,8 @@ fi
 
 if [ "$BEACON_NODE_ENABLE_UPNP" = "true" ]; then
 	ADDITIONAL_ARGS="$ADDITIONAL_ARGS --enable-upnp"
-elif [ -n "$BEACON_NODE_P2P_HOST_IP" ]; then
-    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --p2p-host-ip=$BEACON_NODE_P2P_HOST_IP"
+elif [ -n "$BEACON_NODE_ENABLE_PUBLIC_IP" ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --p2p-host-ip=$(curl -s ifconfig.me)"
 fi
 
 if [ -n "$BEACON_NODE_CHECKPOINT_SYNC_URL" ]; then

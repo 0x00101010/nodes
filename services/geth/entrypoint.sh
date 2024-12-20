@@ -14,7 +14,7 @@ GETH_SYNCMODE="${GETH_SYNCMODE:-snap}"
 GETH_STATE_SCHEME="${GETH_STATE_SCHEME:-path}"
 GETH_MAX_PEERS="${GETH_MAX_PEERS:-100}"
 GETH_ALLOWED_APIS="${GETH_ALLOWED_APIS:-admin,debug,eth,net,txpool,web3}"
-GETH_P2P_ENABLE_UPNP="${GETH_P2P_ENABLE_UPNP:-true}"
+GETH_P2P_ENABLE_UPNP="${GETH_P2P_ENABLE_UPNP:-false}"
 
 # setup
 mkdir -p $GETH_DATA_DIR
@@ -28,8 +28,8 @@ fi
 
 if [ "$GETH_P2P_ENABLE_UPNP" = "true" ]; then
 	ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=upnp"
-elif [ "${GETH_P2P_ADDRESS:+x}" = x ]; then
-    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=extip:$GETH_P2P_ADDRESS"
+elif [ "$GETH_P2P_ENABLE_PUBLIC_IP" = "true" ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --nat=extip:$(curl -s ifconfig.me)"
 fi
 
 # if [ "${GETH_ALLOW_UNPROTECTED_TXS+x}" = x ]; then
