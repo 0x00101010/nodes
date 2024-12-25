@@ -87,3 +87,8 @@ Run `./up.sh` again
     - make sure you see logs like `No active validator keys provided. Waiting until next epoch to check again...` (since this is new)
     - check beacon node, see something like `gRPC client connected to beacon node" addr="172.19.0.12:44694" prefix=rpc`
 - deposit ETH
+
+### Add a new validator account
+
+- call staking cli to generate a new validator information
+    - note that the you need to copy both deposit & keystore file to the validator_keys folder
