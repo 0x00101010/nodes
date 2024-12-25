@@ -77,7 +77,7 @@ Run `./up.sh` again
 - create folder under `keys/` with validator name.
     - create secrets
     - add validator_keys folder into it
-- create a new volume in docker-compose
+- create a new volume in docker-compose for validator
 - duplicate existing validator configs into a new section
     - rename all relevant things with new validator name (yaml tag, container name, depends on, volumes)
     - change `VALIDATOR_METRICS_PORT` and port mapping

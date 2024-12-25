@@ -63,6 +63,9 @@ services:
     env_file:
       - .env
 
+  # =====================================================================
+  # family validator
+  # =====================================================================
   ethereum-mainnet-full-staking-cl-prysm-validator-family:
     build:
       context: ../../../services/prysm
@@ -109,6 +112,62 @@ services:
       - shared_network
     env_file:
       - .env
+  # =====================================================================
+  # family validator - end
+  # =====================================================================
+
+  # =====================================================================
+  # estelle validator
+  # =====================================================================
+  ethereum-mainnet-full-staking-cl-prysm-validator-estelle:
+    build:
+      context: ../../../services/prysm
+      dockerfile: Dockerfile
+      args:
+        - VERSION=v5.2.0
+        - COMMIT=ac1717f1e44bd218b0bd3af0c4dec951c075f462
+    container_name: ethereum-mainnet-full-staking-cl-prysm-validator-estelle
+    command: [ "/app/validator-entrypoint.sh" ]
+    restart: unless-stopped
+    depends_on:
+      ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle:
+        condition: service_completed_successfully
+    volumes:
+      - cl_validator_estelle_data:/data
+      - ./keys/estelle/validator_keys:/app/validator_keys # set your own key path
+      - ./keys/estelle/secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+    ports:
+      - "7021:7021"
+    networks:
+      - shared_network
+    environment:
+      - VALIDATOR_SUGGESTED_FEE_RECIPIENT=0xd6C3FDfF4C7E6EC4cB100a10fbDf3e718BaBa423
+      - VALIDATOR_METRICS_PORT=7021 # same as ports above
+    env_file:
+      - .env
+
+  # importing accounts for validator
+  ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle:
+    build:
+      context: ../../../services/prysm
+      dockerfile: Dockerfile
+      args:
+        - VERSION=v5.2.0
+        - COMMIT=ac1717f1e44bd218b0bd3af0c4dec951c075f462
+    container_name: ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle
+    command: [ "/app/validator-import-accounts.sh" ]
+    volumes:
+      - cl_validator_estelle_data:/data
+      - ./keys/estelle/validator_keys:/config/validator_keys
+      - ./keys/estelle/secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+      - ./keys/estelle/secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
+    networks:
+      - shared_network
+    env_file:
+      - .env
+  # =====================================================================
+  # estelle validator
+  # =====================================================================
 
   ethereum-mainnet-full-staking-mev-boost:
     image: flashbots/mev-boost:1.8

@@ -166,7 +166,7 @@ services:
     env_file:
       - .env
   # =====================================================================
-  # estelle validator
+  # estelle validator - end
   # =====================================================================
 
   ethereum-holesky-full-staking-mev-boost:
