@@ -3,6 +3,10 @@ volumes:
     name: ethereum_holesky_full_staking_el_data
   cl_data:
     name: ethereum_holesky_full_staking_cl_data
+  cl_validator_family_data:
+    name: ethereum_holesky_full_staking_cl_validator_family_data
+  cl_validator_estelle_data:
+    name: ethereum_holesky_full_staking_cl_validator_estelle_data
   prometheus_data:
     name: ethereum_holesky_full_staking_prometheus_data
 
@@ -59,49 +63,58 @@ services:
     env_file:
       - .env
 
-  ethereum-holesky-full-staking-cl-prysm-validator:
+  # =====================================================================
+  # family validator
+  # =====================================================================
+  ethereum-holesky-full-staking-cl-prysm-validator-family:
     build:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
         - VERSION=v5.2.0
         - COMMIT=ac1717f1e44bd218b0bd3af0c4dec951c075f462
-    container_name: ethereum-holesky-full-staking-cl-prysm-validator
+    container_name: ethereum-holesky-full-staking-cl-prysm-validator-family
     command: [ "/app/validator-entrypoint.sh" ]
     restart: unless-stopped
     depends_on:
-      ethereum-holesky-full-staking-cl-prysm-validator-account-import:
+      ethereum-holesky-full-staking-cl-prysm-validator-account-import-family:
         condition: service_completed_successfully
     volumes:
-      - cl_data:/data
-      - ./validator_keys:/app/validator_keys # set your own key path
-      - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+      - cl_validator_family_data:/data
+      - ./keys/family/validator_keys:/config/validator_keys # set your own key path
+      - ./keys/family/secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
     ports:
-      - "${VALIDATOR_METRICS_PORT}:${VALIDATOR_METRICS_PORT}"
+      - "6020:6020"
     networks:
       - shared_network
+    environment:
+      - VALIDATOR_SUGGESTED_FEE_RECIPIENT=0xf0204D1b42a90e4676ebb7d976eA980d85B922cA
+      - VALIDATOR_METRICS_PORT=6020 # same as ports above
     env_file:
       - .env
 
   # importing accounts for validator
-  ethereum-holesky-full-staking-cl-prysm-validator-account-import:
+  ethereum-holesky-full-staking-cl-prysm-validator-account-import-family:
     build:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
         - VERSION=v5.2.0
         - COMMIT=ac1717f1e44bd218b0bd3af0c4dec951c075f462
-    container_name: ethereum-holesky-full-staking-cl-prysm-validator-account-import
+    container_name: ethereum-holesky-full-staking-cl-prysm-validator-account-import-family
     command: [ "/app/validator-import-accounts.sh" ]
     volumes:
-      - cl_data:/data
-      - ./validator_keys:/config/validator_keys
-      - ./secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
-      - ./secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
+      - cl_validator_family_data:/data
+      - ./keys/family/validator_keys:/config/validator_keys
+      - ./keys/family/secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+      - ./keys/family/secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
     networks:
       - shared_network
     env_file:
       - .env
+  # =====================================================================
+  # family validator
+  # =====================================================================
 
   ethereum-holesky-full-staking-mev-boost:
     image: flashbots/mev-boost:1.8
@@ -116,7 +129,7 @@ services:
       - "https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@holesky.titanrelay.xyz"
     restart: unless-stopped
     ports:
-      - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
+      - "${MEV_BOOST_PORT}:${MEV_BOOST_PORT}"
     networks:
       - shared_network
     env_file:
