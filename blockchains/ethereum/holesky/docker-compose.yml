@@ -129,7 +129,7 @@ services:
       - "https://0xab78bf8c781c58078c3beb5710c57940874dd96aef2835e7742c866b4c7c0406754376c2c8285a36c630346aa5c5f833@holesky.aestus.live"
     restart: unless-stopped
     ports:
-      - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
+      - "${MEV_BOOST_PORT}:${MEV_BOOST_PORT}"
     networks:
       - shared_network
     env_file:

@@ -116,7 +116,7 @@ services:
       - "https://0x8c4ed5e24fe5c6ae21018437bde147693f68cda427cd1122cf20819c30eda7ed74f72dece09bb313f2a1855595ab677d@global.titanrelay.xyz"
     restart: unless-stopped
     ports:
-      - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
+      - "${MEV_BOOST_PORT}:${MEV_BOOST_PORT}"
     networks:
       - shared_network
     env_file:

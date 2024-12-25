@@ -146,7 +146,7 @@ services:
       - "https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money"
     restart: unless-stopped
     ports:
-      - "${MEV_BOOT_PORT}:${MEV_BOOST_PORT}"
+      - "${MEV_BOOST_PORT}:${MEV_BOOST_PORT}"
     networks:
       - shared_network
     env_file:
