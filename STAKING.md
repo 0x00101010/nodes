@@ -35,27 +35,28 @@ Run `./up.sh` again
 ## Migrate to multiple validators config
 
 ### First make sure current validator works properly
-- create separate volumes for different validators
 
 - update existing validator & account import container config
+    - create separate volumes for different validators
     - update container tag & container_name with postfix
     - update depends_on with postfix
     - update volumes mapping to newly created volume
     - add `keys/{validator name}` string to volumes mapping
     - add environment section
         - set `VALIDATOR_SUGGESTED_FEE_RECIPIENT`
+        - set `VALIDATOR_METRICS_PORT`
     - change port mapping from using `VALIDATOR_METRICS_PORT` to hardcoded port
 - move existing validator_keys and secrets to keys/family folder (create if not exists)
     - add back keystore-pwd if deleted
+
+- inside `.env`
+    - remove `VALIDATOR_SUGGESTED_FEE_RECIPIENT` and `VALIDATOR_METRICS_PORT`
 
 - run account import container, check logs to make sure it's imported correctly
 
 - stop old validator to avoid slashing
 
 - start new validator
-
-- inside `.env`
-    - remove `VALIDATOR_SUGGESTED_FEE_RECIPIENT` and `VALIDATOR_METRICS_PORT`
 
 - Confirmation
     - validator-account-import
