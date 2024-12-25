@@ -34,6 +34,7 @@ Run `./up.sh` again
 
 ## Migrate to multiple validators config
 
+### First make sure current validator works properly
 - create separate volumes for different validators
 
 - update existing validator & account import container config
@@ -69,3 +70,20 @@ Run `./up.sh` again
         - Make sure no error log for relay
         - `successfully registered validator(s) on builder" num_registrations=1`
     - run up.sh to make sure everything restarts ok
+
+### Create a new validator
+
+- create folder under `keys/` with validator name.
+    - create secrets
+    - add validator_keys folder into it
+- create a new volume in docker-compose
+- duplicate existing validator configs into a new section
+    - rename all relevant things with new validator name (yaml tag, container name, depends on, volumes)
+    - change `VALIDATOR_METRICS_PORT` and port mapping
+    - update `VALIDATOR_SUGGESTED_FEE_RECIPIENT`
+- run account import container
+    - make sure the account imported is correct
+- run validator container
+    - make sure you see logs like `No active validator keys provided. Waiting until next epoch to check again...` (since this is new)
+    - check beacon node, see something like `gRPC client connected to beacon node" addr="172.19.0.12:44694" prefix=rpc`
+- deposit ETH
