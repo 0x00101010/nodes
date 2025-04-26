@@ -20,8 +20,8 @@ services:
       context: ../../../services/geth
       dockerfile: Dockerfile
       args:
-        - VERSION=v1.14.12
-        - COMMIT=293a300d64be3d9a1c2cc92c26fcff4089deadcd
+        - VERSION=v1.15.3
+        - COMMIT=612c9e0f4ae483f180ef96ace86effec6dc9bb0e
     container_name: ethereum-holesky-full-staking-el-geth
     command: [ "/app/entrypoint.sh" ]
     restart: unless-stopped
@@ -44,8 +44,8 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v5.2.0
-        - COMMIT=ac1717f1e44bd218b0bd3af0c4dec951c075f462
+        - VERSION=hackSync
+        - COMMIT=fd4169117820e3983c97df9d9772904834f7683c
     container_name: ethereum-holesky-full-staking-cl-prysm-beacon-node
     command: [ "/app/beacon-node-entrypoint.sh" ]
     restart: unless-stopped
@@ -71,8 +71,8 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v5.2.0
-        - COMMIT=ac1717f1e44bd218b0bd3af0c4dec951c075f462
+        - VERSION=hackSync
+        - COMMIT=fd4169117820e3983c97df9d9772904834f7683c
     container_name: ethereum-holesky-full-staking-cl-prysm-validator-family
     command: [ "/app/validator-entrypoint.sh" ]
     restart: unless-stopped
@@ -90,6 +90,7 @@ services:
     environment:
       - VALIDATOR_SUGGESTED_FEE_RECIPIENT=0xf0204D1b42a90e4676ebb7d976eA980d85B922cA
       - VALIDATOR_METRICS_PORT=6020 # same as ports above
+      - ADDITIONAL_ARGS=--force-clear-db
     env_file:
       - .env
 
@@ -99,8 +100,8 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v5.2.0
-        - COMMIT=ac1717f1e44bd218b0bd3af0c4dec951c075f462
+        - VERSION=hackSync
+        - COMMIT=fd4169117820e3983c97df9d9772904834f7683c
     container_name: ethereum-holesky-full-staking-cl-prysm-validator-account-import-family
     command: [ "/app/validator-import-accounts.sh" ]
     volumes:
@@ -124,8 +125,8 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v5.2.0
-        - COMMIT=ac1717f1e44bd218b0bd3af0c4dec951c075f462
+        - VERSION=hackSync
+        - COMMIT=fd4169117820e3983c97df9d9772904834f7683c
     container_name: ethereum-holesky-full-staking-cl-prysm-validator-estelle
     command: [ "/app/validator-entrypoint.sh" ]
     restart: unless-stopped
@@ -152,8 +153,8 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v5.2.0
-        - COMMIT=ac1717f1e44bd218b0bd3af0c4dec951c075f462
+        - VERSION=hackSync
+        - COMMIT=fd4169117820e3983c97df9d9772904834f7683c
     container_name: ethereum-holesky-full-staking-cl-prysm-validator-account-import-estelle
     command: [ "/app/validator-import-accounts.sh" ]
     volumes:
