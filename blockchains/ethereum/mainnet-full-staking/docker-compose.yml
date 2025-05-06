@@ -20,8 +20,8 @@ services:
       context: ../../../services/geth
       dockerfile: Dockerfile
       args:
-        - VERSION=v1.15.10
-        - COMMIT=2bf8a78984d70e8d5a695879494b17193f1bcf57
+        - VERSION=v1.15.11
+        - COMMIT=36b2371c59cd91a9b1da062b3e382f05a6d8687e
     container_name: ethereum-mainnet-full-staking-el-geth
     command: [ "/app/entrypoint.sh" ]
     restart: unless-stopped
@@ -44,8 +44,8 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v6.0.0
-        - COMMIT=a0071826c5daf7dc3a6e76874fdaa76481a3c665
+        - VERSION=v6.0.1
+        - COMMIT=204302a821da57632ec4e2d89126a21f00bd2817
     container_name: ethereum-mainnet-full-staking-cl-prysm-beacon-node
     command: [ "/app/beacon-node-entrypoint.sh" ]
     restart: unless-stopped
@@ -71,8 +71,8 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v6.0.0
-        - COMMIT=a0071826c5daf7dc3a6e76874fdaa76481a3c665
+        - VERSION=v6.0.1
+        - COMMIT=204302a821da57632ec4e2d89126a21f00bd2817
     container_name: ethereum-mainnet-full-staking-cl-prysm-validator-family
     command: [ "/app/validator-entrypoint.sh" ]
     restart: unless-stopped
@@ -99,8 +99,8 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v6.0.0
-        - COMMIT=a0071826c5daf7dc3a6e76874fdaa76481a3c665
+        - VERSION=v6.0.1
+        - COMMIT=204302a821da57632ec4e2d89126a21f00bd2817
     container_name: ethereum-mainnet-full-staking-cl-prysm-validator-account-import-family
     command: [ "/app/validator-import-accounts.sh" ]
     volumes:
@@ -124,8 +124,8 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v6.0.0
-        - COMMIT=a0071826c5daf7dc3a6e76874fdaa76481a3c665
+        - VERSION=v6.0.1
+        - COMMIT=204302a821da57632ec4e2d89126a21f00bd2817
     container_name: ethereum-mainnet-full-staking-cl-prysm-validator-estelle
     command: [ "/app/validator-entrypoint.sh" ]
     restart: unless-stopped
@@ -152,8 +152,8 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v6.0.0
-        - COMMIT=a0071826c5daf7dc3a6e76874fdaa76481a3c665
+        - VERSION=v6.0.1
+        - COMMIT=204302a821da57632ec4e2d89126a21f00bd2817
     container_name: ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle
     command: [ "/app/validator-import-accounts.sh" ]
     volumes:

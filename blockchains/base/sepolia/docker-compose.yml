@@ -11,8 +11,11 @@ networks:
 services:
   base-sepolia-reth:
     build:
-      context: ../../../services/reth
+      context: ../../../services/op-reth
       dockerfile: Dockerfile
+      args:
+        - VERSION=v1.3.12
+        - COMMIT=6f8e7258f4733279080e4bd8345ce50538a40d6e
     container_name: base-sepolia-reth
     command: [ "/app/reth-entrypoint.sh" ]
     restart: unless-stopped
