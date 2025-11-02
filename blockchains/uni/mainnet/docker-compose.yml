@@ -1,0 +1,73 @@
+volumes:
+  el_data:
+  cl_data:
+  prometheus_data:
+
+networks:
+  shared_network:
+    external: true
+
+services:
+  el:
+    build:
+      context: ../../../services/op-reth
+      dockerfile: Dockerfile.dev
+      args:
+        - COMMIT=982e5dbe97dbb8cb04ddb58b619a2c6267d8d82b
+    command: [ "/app/entrypoint.sh" ]
+    container_name: "${EL_DNS}"
+    restart: unless-stopped
+    volumes:
+      - el_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
+      - "${EL_WS_PORT}:${EL_WS_PORT}" # ws rpc
+      - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
+      - "${EL_AUTHRPC_PORT}:${EL_AUTHRPC_PORT}"
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  cl:
+    build:
+      context: ../../../services/op-node
+      dockerfile: Dockerfile
+      args:
+        - VERSION=v8.0.0-rc.2
+    command: [ "/app/entrypoint.sh" ]
+    container_name: "${CL_DNS}"
+    restart: unless-stopped
+    volumes:
+      - cl_data:/data
+      - ./secrets/jwtsecret:/config/jwtsecret
+    ports:
+      - "${OP_NODE_RPC_PORT}:${OP_NODE_RPC_PORT}"
+      - "${OP_NODE_METRICS_PORT}:${OP_NODE_METRICS_PORT}"
+      - "${OP_NODE_P2P_LISTEN_TCP_PORT}:${OP_NODE_P2P_LISTEN_TCP_PORT}"
+      - "${OP_NODE_P2P_LISTEN_UDP_PORT}:${OP_NODE_P2P_LISTEN_UDP_PORT}/udp"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+
+  prometheus:
+    build:
+      context: ../../../services/prometheus
+      dockerfile: Dockerfile
+    container_name: "${PROMETHEUS_DNS}"
+    command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/data
+      - ./prometheus-template.yml:/app/prometheus-template.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env

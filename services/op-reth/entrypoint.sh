@@ -30,9 +30,41 @@ if [ "${RETH_SEQUENCER_HTTP+x}" = x ]; then
     ADDITIONAL_ARGS="$ADDITIONAL_ARGS --rollup.sequencer-http $RETH_SEQUENCER_HTTP"
 fi
 
+# /// Set the minimum log level.
+# ///
+# /// -v      Errors
+# /// -vv     Warnings
+# /// -vvv    Info
+# /// -vvvv   Debug
+# /// -vvvvv  Traces (warning: very verbose!)
+RETH_LOG_LEVEL="${RETH_LOG_LEVEL:-info}"
+LOG_FLAG=""
+
+case "${RETH_LOG_LEVEL,,}" in
+    error)
+        LOG_FLAG="-v"
+        ;;
+    warn|warning)
+        LOG_FLAG="-vv"
+        ;;
+    info)
+        LOG_FLAG="-vvv"
+        ;;
+    debug)
+        LOG_FLAG="-vvvv"
+        ;;
+    trace)
+        LOG_FLAG="-vvvvv"
+        ;;
+    *)
+        echo "Invalid RETH_LOG_LEVEL: $RETH_LOG_LEVEL. Must be one of: error, warn, info, debug, trace" 1>&2
+        exit 1
+        ;;
+esac
+
 exec ./$RETH_BIN \
     node \
-    -vvv \
+    $LOG_FLAG \
     --chain "$RETH_CHAIN" \
     --datadir "$RETH_DATA_DIR" \
     --log.stdout.format log-fmt \

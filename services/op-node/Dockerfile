@@ -16,4 +16,4 @@ FROM ubuntu:24.04
 WORKDIR /app
 
 COPY --from=builder /app/op-node/bin/op-node    /app/
-COPY ./op-node-entrypoint.sh                    /app/
+COPY ./op-node-entrypoint.sh                    /app/entrypoint.sh
