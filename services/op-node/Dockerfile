@@ -3,12 +3,22 @@ ARG BASE_IMAGE=ubuntu:24.04
 FROM ${BASE_IMAGE} AS builder
 WORKDIR /app
 
-RUN apt update -y && apt install -y git gpg sudo wget curl apt-utils libclang-dev build-essential
-RUN install -dm 755 /etc/apt/keyrings
-RUN wget -qO - https://mise.jdx.dev/gpg-key.pub | gpg --dearmor | tee /etc/apt/keyrings/mise-archive-keyring.gpg 1> /dev/null
-RUN echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main" | tee /etc/apt/sources.list.d/mise.list
 RUN apt update
-RUN apt install -y mise
+RUN apt install -y \
+    curl \
+    git \
+    ca-certificates \
+    bash \
+    build-essential \
+    make \
+    wget \
+    libclang-dev
+
+# install mise (platform/arch auto-detected)
+RUN curl -fsSL https://mise.run | sh
+ENV PATH="/root/.local/share/mise/shims:/root/.local/bin:${PATH}"
+SHELL ["/bin/bash", "-lc"]
+RUN eval "$(mise activate bash)"
 
 ARG REPO=https://github.com/ethereum-optimism/optimism.git
 ARG COMMIT=971c25eb5a5564ce239e3c4a95778abb24ca87d7
