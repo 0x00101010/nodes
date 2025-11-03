@@ -30,6 +30,10 @@ if [ "${RETH_SEQUENCER_HTTP+x}" = x ]; then
     ADDITIONAL_ARGS="$ADDITIONAL_ARGS --rollup.sequencer-http $RETH_SEQUENCER_HTTP"
 fi
 
+if [ "${RETH_FLASHBLOCKS_URL+x} = x" ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --flashblocks-url $RETH_FLASHBLOCKS_URL"
+fi
+
 # /// Set the minimum log level.
 # ///
 # /// -v      Errors
