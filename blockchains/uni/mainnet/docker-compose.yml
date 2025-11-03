@@ -13,8 +13,8 @@ services:
       context: ../../../services/op-reth
       dockerfile: Dockerfile.dev
       args:
-        - REPO=https://github.com/0x00101010/reth.git
-        - COMMIT=b03d1295c62d8ca514b914ac66b68b50bf5dbc9f
+        - REPO=${RETH_REPO}
+        - COMMIT=${RETH_COMMIT}
     command: [ "/app/entrypoint.sh" ]
     container_name: "${EL_DNS}"
     restart: unless-stopped
