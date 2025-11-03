@@ -30,7 +30,7 @@ if [ "${RETH_SEQUENCER_HTTP+x}" = x ]; then
     ADDITIONAL_ARGS="$ADDITIONAL_ARGS --rollup.sequencer-http $RETH_SEQUENCER_HTTP"
 fi
 
-if [ "${RETH_FLASHBLOCKS_URL+x} = x" ]; then
+if [ "${RETH_FLASHBLOCKS_URL+x}" = x ]; then
     ADDITIONAL_ARGS="$ADDITIONAL_ARGS --flashblocks-url $RETH_FLASHBLOCKS_URL"
 fi
 
@@ -88,7 +88,5 @@ exec ./$RETH_BIN \
     --metrics "0.0.0.0:$EL_METRICS_PORT" \
     --discovery.port "$EL_P2P_PORT" \
     --port "$EL_P2P_PORT" \
-    # --disable-discovery \
-    # --rollup.disable-tx-pool-gossip \
     $ADDITIONAL_ARGS
 
