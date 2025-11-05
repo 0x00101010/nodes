@@ -16,6 +16,7 @@ services:
         - REPO=${RETH_REPO}
         - COMMIT=${RETH_COMMIT}
         - RETH_BUILD_PROFILE=${RETH_BUILD_PROFILE}
+        - RETH_BUILD_TARGET_FOLDER=${RETH_BUILD_TARGET_FOLDER}
     command: [ "/app/entrypoint.sh" ]
     container_name: "${EL_DNS}"
     restart: unless-stopped

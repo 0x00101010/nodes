@@ -23,7 +23,7 @@ RUN eval "$(mise activate bash)"
 ARG RUST_VERSION=1.88
 ARG REPO=https://github.com/0x00101010/reth.git
 ARG COMMIT=982e5dbe97dbb8cb04ddb58b619a2c6267d8d82b
-ARG RETH_BUILD_PROFILE=dev
+ARG RETH_BUILD_PROFILE=release
 
 RUN mise install rust@${RUST_VERSION}
 RUN mise use -g rust@${RUST_VERSION}
@@ -47,5 +47,7 @@ RUN apt-get update && \
     vim \
     iproute2
 
-COPY --from=builder     /app/target/debug/op-reth   /app/
-COPY ./entrypoint.sh                                /app/
+ARG RETH_BUILD_TARGET_FOLDER=/app/target/release/op-reth
+
+COPY --from=builder     ${RETH_BUILD_TARGET_FOLDER}     /app/
+COPY ./entrypoint.sh                                    /app/
