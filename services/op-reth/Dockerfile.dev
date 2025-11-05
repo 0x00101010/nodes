@@ -23,6 +23,7 @@ RUN eval "$(mise activate bash)"
 ARG RUST_VERSION=1.88
 ARG REPO=https://github.com/0x00101010/reth.git
 ARG COMMIT=982e5dbe97dbb8cb04ddb58b619a2c6267d8d82b
+ARG RETH_BUILD_PROFILE=dev
 
 RUN mise install rust@${RUST_VERSION}
 RUN mise use -g rust@${RUST_VERSION}
@@ -34,7 +35,7 @@ RUN git init && \
     git checkout FETCH_HEAD
 
 # build
-RUN PROFILE=dev make build-op
+RUN PROFILE=${RETH_BUILD_PROFILE} make build-op
 
 FROM ${BASE_IMAGE}
 WORKDIR /app
