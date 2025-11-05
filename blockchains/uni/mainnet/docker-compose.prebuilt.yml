@@ -1,0 +1,6 @@
+services:
+  el:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - RETH_VERSION=${RETH_VERSION}

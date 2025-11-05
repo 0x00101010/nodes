@@ -1,0 +1,10 @@
+services:
+  el:
+    build:
+      dockerfile: Dockerfile.dev
+      args:
+        - REPO=${RETH_REPO}
+        - COMMIT=${RETH_COMMIT}
+        - RUST_VERSION=${RUST_VERSION}
+        - RETH_BUILD_PROFILE=dev
+        - RETH_BUILD_TARGET_FOLDER=/app/target/debug/op-reth

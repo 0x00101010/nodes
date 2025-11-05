@@ -20,21 +20,20 @@ ENV PATH="/root/.local/share/mise/shims:/root/.local/bin:${PATH}"
 SHELL ["/bin/bash", "-lc"]
 RUN eval "$(mise activate bash)"
 
-ARG RUST_VERSION=1.88
-ARG REPO=https://github.com/0x00101010/reth.git
-ARG COMMIT=982e5dbe97dbb8cb04ddb58b619a2c6267d8d82b
-ARG RETH_BUILD_PROFILE=release
-
+ARG RUST_VERSION
 RUN mise install rust@${RUST_VERSION}
 RUN mise use -g rust@${RUST_VERSION}
 
 # download source code
+ARG REPO
+ARG COMMIT
 RUN git init && \
     git remote add origin ${REPO} && \
     git fetch --depth 1 origin ${COMMIT} && \
     git checkout FETCH_HEAD
 
 # build
+ARG RETH_BUILD_PROFILE
 RUN PROFILE=${RETH_BUILD_PROFILE} make build-op
 
 FROM ${BASE_IMAGE}
@@ -47,7 +46,6 @@ RUN apt-get update && \
     vim \
     iproute2
 
-ARG RETH_BUILD_TARGET_FOLDER=/app/target/release/op-reth
-
+ARG RETH_BUILD_TARGET_FOLDER
 COPY --from=builder     ${RETH_BUILD_TARGET_FOLDER}     /app/
 COPY ./entrypoint.sh                                    /app/

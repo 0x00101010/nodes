@@ -11,12 +11,8 @@ services:
   el:
     build:
       context: ../../../services/op-reth
-      dockerfile: Dockerfile.dev
-      args:
-        - REPO=${RETH_REPO}
-        - COMMIT=${RETH_COMMIT}
-        - RETH_BUILD_PROFILE=${RETH_BUILD_PROFILE}
-        - RETH_BUILD_TARGET_FOLDER=${RETH_BUILD_TARGET_FOLDER}
+      # dockerfile is specified in profile-specific override files
+      # args is specified in profile-specific override files as well
     command: [ "/app/entrypoint.sh" ]
     container_name: "${EL_DNS}"
     restart: unless-stopped
