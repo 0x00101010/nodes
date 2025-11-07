@@ -1,26 +1,23 @@
 volumes:
-  reth_data:
-    name: base_sepolia_reth_data
+  el_data:
+  cl_data:
   prometheus_data:
-    name: base_sepolia_prometheus_data
 
 networks:
   shared_network:
     external: true
 
 services:
-  base-sepolia-reth:
+  el:
     build:
       context: ../../../services/op-reth
-      dockerfile: Dockerfile
-      args:
-        - VERSION=v1.3.12
-        - COMMIT=6f8e7258f4733279080e4bd8345ce50538a40d6e
-    container_name: base-sepolia-reth
-    command: [ "/app/reth-entrypoint.sh" ]
+      # dockerfile is specified in profile-specific override files
+      # args is specified in profile-specific override files as well
+    command: [ "/app/entrypoint.sh" ]
+    container_name: "${EL_DNS}"
     restart: unless-stopped
     volumes:
-      - reth_data:/data
+      - el_data:/data
       - ./secrets/jwtsecret:/config/jwtsecret
     ports:
       - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
@@ -33,14 +30,18 @@ services:
     env_file:
       - .env
 
-  base-sepolia-node:
+  cl:
     build:
       context: ../../../services/op-node
       dockerfile: Dockerfile
-    container_name: base-sepolia-node
-    command: [ "/app/op-node-entrypoint.sh" ]
+      args:
+        - COMMIT=971c25eb5a5564ce239e3c4a95778abb24ca87d7
+        - VERSION=v1.16.0
+    command: [ "/app/entrypoint.sh" ]
+    container_name: "${CL_DNS}"
     restart: unless-stopped
     volumes:
+      - cl_data:/data
       - ./secrets/jwtsecret:/config/jwtsecret
     ports:
       - "${OP_NODE_RPC_PORT}:${OP_NODE_RPC_PORT}"
@@ -52,15 +53,18 @@ services:
     env_file:
       - .env
 
-  base-sepolia-prometheus:
+  prometheus:
     build:
       context: ../../../services/prometheus
       dockerfile: Dockerfile
-    container_name: base-sepolia-prometheus
+    container_name: "${PROMETHEUS_DNS}"
     command: [ "/app/prometheus-entrypoint.sh" ]
     restart: unless-stopped
     volumes:
       - prometheus_data:/data
+      - ./prometheus-template.yml:/app/prometheus-template.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
     networks:
