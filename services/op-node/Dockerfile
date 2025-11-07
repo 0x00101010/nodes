@@ -12,7 +12,8 @@ RUN apt install -y \
     build-essential \
     make \
     wget \
-    libclang-dev
+    libclang-dev \
+    ca-certificates
 
 # install mise (platform/arch auto-detected)
 RUN curl -fsSL https://mise.run | sh

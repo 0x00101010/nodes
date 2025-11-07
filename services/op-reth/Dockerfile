@@ -11,7 +11,8 @@ RUN apt-get update && \
     wget \
     jq \
     vim \
-    iproute2
+    iproute2 \
+    ca-certificates
 
 RUN wget "https://github.com/paradigmxyz/reth/releases/download/${RETH_VERSION}/reth-${RETH_VERSION}-x86_64-unknown-linux-gnu.tar.gz" && \
     tar -xvf "reth-${RETH_VERSION}-x86_64-unknown-linux-gnu.tar.gz" && \
