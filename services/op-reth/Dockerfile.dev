@@ -44,7 +44,8 @@ RUN apt-get update && \
     curl \
     jq \
     vim \
-    iproute2
+    iproute2 \
+    ca-certificates
 
 ARG RETH_BUILD_TARGET_FOLDER
 COPY --from=builder     ${RETH_BUILD_TARGET_FOLDER}     /app/

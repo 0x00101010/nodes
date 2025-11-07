@@ -12,8 +12,7 @@ RUN apt install -y \
     build-essential \
     make \
     wget \
-    libclang-dev \
-    ca-certificates
+    libclang-dev
 
 # install mise (platform/arch auto-detected)
 RUN curl -fsSL https://mise.run | sh
@@ -39,6 +38,9 @@ RUN make op-node
 # execution environment
 FROM ${BASE_IMAGE}
 WORKDIR /app
+
+RUN apt update
+RUN apt install -y ca-certificates
 
 COPY --from=builder /app/op-node/bin/op-node    /app/
 COPY ./op-node-entrypoint.sh                    /app/entrypoint.sh
