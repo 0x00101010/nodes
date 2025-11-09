@@ -41,6 +41,11 @@ else
     echo "==> Network $NETWORK_NAME already exists"
 fi
 
+if [ -f .env.local ]; then
+    set -a # automatically export all variables
+    source .env.local
+fi
+
 # Launch with the selected profile
 echo "==> Starting containers with profile: $PROFILE"
 docker compose -f docker-compose.yml -f docker-compose.$PROFILE.yml up --build -d
