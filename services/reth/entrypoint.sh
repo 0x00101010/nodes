@@ -42,5 +42,6 @@ exec ./reth \
     --authrpc.jwtsecret /config/jwtsecret \
     --metrics "0.0.0.0:$EL_METRICS_PORT" \
     --discovery.port "$EL_P2P_PORT" \
+    --discovery.v5.port "$EL_P2P_PORT" \
     --port "$EL_P2P_PORT" \
     $ADDITIONAL_ARGS
