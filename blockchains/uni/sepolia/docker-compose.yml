@@ -25,6 +25,7 @@ services:
       - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
       - "${EL_AUTHRPC_PORT}:${EL_AUTHRPC_PORT}"
       - "${EL_P2P_PORT}:${EL_P2P_PORT}"
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}/udp"
     networks:
       - shared_network
     env_file:
