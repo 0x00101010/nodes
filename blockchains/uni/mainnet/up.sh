@@ -48,6 +48,6 @@ fi
 
 # Launch with the selected profile
 echo "==> Starting containers with profile: $PROFILE"
-docker compose -f docker-compose.yml -f docker-compose.$PROFILE.yml up --build -d
+docker compose -f docker-compose.yml -f docker-compose.$PROFILE.yml up --build -d --force-create
 
 echo "==> Done! Containers are running."

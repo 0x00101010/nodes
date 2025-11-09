@@ -29,6 +29,7 @@ services:
       - shared_network
     env_file:
       - .env
+      - .env.local
 
   cl:
     build:
@@ -52,6 +53,7 @@ services:
       - shared_network
     env_file:
       - .env
+      - .env.local
 
   prometheus:
     build:
@@ -71,3 +73,4 @@ services:
       - shared_network
     env_file:
       - .env
+      - .env.local
