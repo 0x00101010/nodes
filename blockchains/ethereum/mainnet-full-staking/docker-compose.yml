@@ -20,8 +20,9 @@ services:
       context: ../../../services/geth
       dockerfile: Dockerfile
       args:
-        - VERSION=v1.15.11
-        - COMMIT=36b2371c59cd91a9b1da062b3e382f05a6d8687e
+        - GO_VERSION=1.24.0
+        - VERSION=v1.16.7 # go-ethereum version
+        - COMMIT=b9f3a3d964ed3d31e710ec7dd66da9181477ecb2
     container_name: ethereum-mainnet-full-staking-el-geth
     command: [ "/app/entrypoint.sh" ]
     restart: unless-stopped
@@ -44,8 +45,9 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v6.0.1
-        - COMMIT=204302a821da57632ec4e2d89126a21f00bd2817
+        - GO_VERSION=1.25.1
+        - VERSION=v7.0.0
+        - COMMIT=7794a77ae61bdceb70a019b9bb1f58651020eae9
     container_name: ethereum-mainnet-full-staking-cl-prysm-beacon-node
     command: [ "/app/beacon-node-entrypoint.sh" ]
     restart: unless-stopped
@@ -71,8 +73,9 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v6.0.1
-        - COMMIT=204302a821da57632ec4e2d89126a21f00bd2817
+        - GO_VERSION=1.25.1
+        - VERSION=v7.0.0
+        - COMMIT=7794a77ae61bdceb70a019b9bb1f58651020eae9
     container_name: ethereum-mainnet-full-staking-cl-prysm-validator-family
     command: [ "/app/validator-entrypoint.sh" ]
     restart: unless-stopped
@@ -99,8 +102,9 @@ services:
       context: ../../../services/prysm
       dockerfile: Dockerfile
       args:
-        - VERSION=v6.0.1
-        - COMMIT=204302a821da57632ec4e2d89126a21f00bd2817
+        - GO_VERSION=1.25.1
+        - VERSION=v7.0.0
+        - COMMIT=7794a77ae61bdceb70a019b9bb1f58651020eae9
     container_name: ethereum-mainnet-full-staking-cl-prysm-validator-account-import-family
     command: [ "/app/validator-import-accounts.sh" ]
     volumes:
@@ -119,58 +123,60 @@ services:
   # =====================================================================
   # estelle validator
   # =====================================================================
-  ethereum-mainnet-full-staking-cl-prysm-validator-estelle:
-    build:
-      context: ../../../services/prysm
-      dockerfile: Dockerfile
-      args:
-        - VERSION=v6.0.1
-        - COMMIT=204302a821da57632ec4e2d89126a21f00bd2817
-    container_name: ethereum-mainnet-full-staking-cl-prysm-validator-estelle
-    command: [ "/app/validator-entrypoint.sh" ]
-    restart: unless-stopped
-    depends_on:
-      ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle:
-        condition: service_completed_successfully
-    volumes:
-      - cl_validator_estelle_data:/data
-      - ./keys/estelle/validator_keys:/app/validator_keys # set your own key path
-      - ./keys/estelle/secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
-    ports:
-      - "7021:7021"
-    networks:
-      - shared_network
-    environment:
-      - VALIDATOR_SUGGESTED_FEE_RECIPIENT=0xd6C3FDfF4C7E6EC4cB100a10fbDf3e718BaBa423
-      - VALIDATOR_METRICS_PORT=7021 # same as ports above
-    env_file:
-      - .env
+  # ethereum-mainnet-full-staking-cl-prysm-validator-estelle:
+  #   build:
+  #     context: ../../../services/prysm
+  #     dockerfile: Dockerfile
+  #     args:
+  #       - GO_VERSION=1.25.1
+  #       - VERSION=v7.0.0
+  #       - COMMIT=7794a77ae61bdceb70a019b9bb1f58651020eae9
+  #   container_name: ethereum-mainnet-full-staking-cl-prysm-validator-estelle
+  #   command: [ "/app/validator-entrypoint.sh" ]
+  #   restart: unless-stopped
+  #   depends_on:
+  #     ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle:
+  #       condition: service_completed_successfully
+  #   volumes:
+  #     - cl_validator_estelle_data:/data
+  #     - ./keys/estelle/validator_keys:/app/validator_keys # set your own key path
+  #     - ./keys/estelle/secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+  #   ports:
+  #     - "7021:7021"
+  #   networks:
+  #     - shared_network
+  #   environment:
+  #     - VALIDATOR_SUGGESTED_FEE_RECIPIENT=0xd6C3FDfF4C7E6EC4cB100a10fbDf3e718BaBa423
+  #     - VALIDATOR_METRICS_PORT=7021 # same as ports above
+  #   env_file:
+  #     - .env
 
-  # importing accounts for validator
-  ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle:
-    build:
-      context: ../../../services/prysm
-      dockerfile: Dockerfile
-      args:
-        - VERSION=v6.0.1
-        - COMMIT=204302a821da57632ec4e2d89126a21f00bd2817
-    container_name: ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle
-    command: [ "/app/validator-import-accounts.sh" ]
-    volumes:
-      - cl_validator_estelle_data:/data
-      - ./keys/estelle/validator_keys:/config/validator_keys
-      - ./keys/estelle/secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
-      - ./keys/estelle/secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
-    networks:
-      - shared_network
-    env_file:
-      - .env
+  # # importing accounts for validator
+  # ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle:
+  #   build:
+  #     context: ../../../services/prysm
+  #     dockerfile: Dockerfile
+  #     args:
+  #       - GO_VERSION=1.25.1
+  #       - VERSION=v7.0.0
+  #       - COMMIT=7794a77ae61bdceb70a019b9bb1f58651020eae9
+  #   container_name: ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle
+  #   command: [ "/app/validator-import-accounts.sh" ]
+  #   volumes:
+  #     - cl_validator_estelle_data:/data
+  #     - ./keys/estelle/validator_keys:/config/validator_keys
+  #     - ./keys/estelle/secrets/wallet-pwd:/config/wallet-pwd # remember to set your passwd
+  #     - ./keys/estelle/secrets/keystore-pwd:/config/keystore-pwd # remember to set your passwd
+  #   networks:
+  #     - shared_network
+  #   env_file:
+  #     - .env
   # =====================================================================
   # estelle validator
   # =====================================================================
 
   ethereum-mainnet-full-staking-mev-boost:
-    image: flashbots/mev-boost:1.9
+    image: flashbots/mev-boost:1.10
     container_name: ethereum-mainnet-full-staking-mev-boost
     command:
       - "-$NETWORK"

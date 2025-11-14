@@ -34,6 +34,10 @@ if [ "${RETH_FLASHBLOCKS_URL+x}" = x ]; then
     ADDITIONAL_ARGS="$ADDITIONAL_ARGS --flashblocks-url $RETH_FLASHBLOCKS_URL"
 fi
 
+if [ "${RETH_FLASHBLOCK_CONSENSUS+x}" = x ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --flashblock-consensus"
+fi
+
 # /// Set the minimum log level.
 # ///
 # /// -v      Errors
