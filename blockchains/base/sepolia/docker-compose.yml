@@ -37,8 +37,8 @@ services:
       context: ../../../services/op-node
       dockerfile: Dockerfile
       args:
-        - COMMIT=971c25eb5a5564ce239e3c4a95778abb24ca87d7
-        - VERSION=v1.16.0
+        - COMMIT=94706ec5072b13030600d1b45ae10b673b660c0d
+        - VERSION=v1.16.1
     command: [ "/app/entrypoint.sh" ]
     container_name: "${CL_DNS}"
     restart: unless-stopped
