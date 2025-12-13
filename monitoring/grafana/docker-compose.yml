@@ -1,0 +1,26 @@
+volumes:
+  grafana_data:
+
+networks:
+  shared_network:
+    external: true
+
+services:
+  grafana:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "${GRAFANA_DNS}"
+    command: ["/app/entrypoint.sh"]
+    restart: unless-stopped
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+      - path: .env.secrets
+        required: false
+    
