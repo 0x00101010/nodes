@@ -19,6 +19,6 @@ docker compose up --build -d
 echo ""
 echo "==> Done! Services are running:"
 echo "  - Grafana:       http://localhost:3000"
-echo "  - Prometheus:    http://localhost:9090"
+echo "  - Prometheus:    http://localhost:9190"
 echo "  - Node Exporter: http://localhost:9100"
 echo "  - cAdvisor:      http://localhost:8080"

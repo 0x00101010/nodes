@@ -60,7 +60,7 @@ services:
       - ./exporters/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     ports:
-      - "9190:9090"
+      - "9190:9190"
     networks:
       - shared_network
     depends_on:
