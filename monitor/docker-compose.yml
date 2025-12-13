@@ -77,7 +77,7 @@ services:
     command: ["/app/entrypoint.sh"]
     restart: unless-stopped
     volumes:
-      - grafana_data:/var/lib/grafana
+      - grafana_data:/data
     ports:
       - "3000:3000"
     networks:
