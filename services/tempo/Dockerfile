@@ -26,7 +26,7 @@ RUN case "${TARGETARCH}" in \
         darwin) TEMPO_OS="apple-darwin" ;; \
         *) echo "Unsupported OS: ${TARGETOS}" && exit 1 ;; \
     esac && \
-    wget "https://github.com/tempoxyz/tempo/releases/download/${TEMPO_VERSION}/tempo-v${TEMPO_VERSION}-${TEMPO_ARCH}-${TEMPO_OS}.tar.gz" && \
+    wget "https://github.com/tempoxyz/tempo/releases/download/${TEMPO_VERSION}/tempo-${TEMPO_VERSION}-${TEMPO_ARCH}-${TEMPO_OS}.tar.gz" && \
     tar -xvf "tempo-${TEMPO_VERSION}-${TEMPO_ARCH}-${TEMPO_OS}.tar.gz" && \
     rm -rf "tempo-${TEMPO_VERSION}-${TEMPO_ARCH}-${TEMPO_OS}*"
 
