@@ -46,8 +46,8 @@ services:
       dockerfile: Dockerfile
       args:
         - GO_VERSION=1.25.1
-        - VERSION=v7.0.0
-        - COMMIT=7794a77ae61bdceb70a019b9bb1f58651020eae9
+        - VERSION=v7.1.0
+        - COMMIT=7a70abbd15c18b1767564695be68c0c106eeae5c
     container_name: ethereum-mainnet-full-staking-cl-prysm-beacon-node
     command: [ "/app/beacon-node-entrypoint.sh" ]
     restart: unless-stopped
@@ -74,8 +74,8 @@ services:
       dockerfile: Dockerfile
       args:
         - GO_VERSION=1.25.1
-        - VERSION=v7.0.0
-        - COMMIT=7794a77ae61bdceb70a019b9bb1f58651020eae9
+        - VERSION=v7.1.0
+        - COMMIT=7a70abbd15c18b1767564695be68c0c106eeae5c
     container_name: ethereum-mainnet-full-staking-cl-prysm-validator-family
     command: [ "/app/validator-entrypoint.sh" ]
     restart: unless-stopped
@@ -103,8 +103,8 @@ services:
       dockerfile: Dockerfile
       args:
         - GO_VERSION=1.25.1
-        - VERSION=v7.0.0
-        - COMMIT=7794a77ae61bdceb70a019b9bb1f58651020eae9
+        - VERSION=v7.1.0
+        - COMMIT=7a70abbd15c18b1767564695be68c0c106eeae5c
     container_name: ethereum-mainnet-full-staking-cl-prysm-validator-account-import-family
     command: [ "/app/validator-import-accounts.sh" ]
     volumes:
@@ -129,7 +129,7 @@ services:
   #     dockerfile: Dockerfile
   #     args:
   #       - GO_VERSION=1.25.1
-  #       - VERSION=v7.0.0
+  #       - VERSION=v7.1.0
   #       - COMMIT=7794a77ae61bdceb70a019b9bb1f58651020eae9
   #   container_name: ethereum-mainnet-full-staking-cl-prysm-validator-estelle
   #   command: [ "/app/validator-entrypoint.sh" ]
@@ -158,7 +158,7 @@ services:
   #     dockerfile: Dockerfile
   #     args:
   #       - GO_VERSION=1.25.1
-  #       - VERSION=v7.0.0
+  #       - VERSION=v7.1.0
   #       - COMMIT=7794a77ae61bdceb70a019b9bb1f58651020eae9
   #   container_name: ethereum-mainnet-full-staking-cl-prysm-validator-account-import-estelle
   #   command: [ "/app/validator-import-accounts.sh" ]

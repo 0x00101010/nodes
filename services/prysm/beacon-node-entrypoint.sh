@@ -54,5 +54,4 @@ exec ./beacon-node \
     --p2p-udp-port "$BEACON_NODE_P2P_PORT" \
     --monitoring-host 0.0.0.0 \
     --monitoring-port "$BEACON_NODE_METRICS_PORT" \
-    --disable-last-epoch-targets \
     $ADDITIONAL_ARGS # intentionally unquoted
