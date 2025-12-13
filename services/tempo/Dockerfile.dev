@@ -1,0 +1,55 @@
+ARG BASE_IMAGE=ubuntu:24.04
+
+FROM ${BASE_IMAGE} AS builder
+WORKDIR /app
+
+RUN apt update
+RUN apt install -y \
+    curl \
+    git \
+    ca-certificates \
+    bash \
+    build-essential \
+    make \
+    wget \
+    libclang-dev \
+    pkg-config \
+    libssl-dev
+
+# install mise (platform/arch auto-detected)
+RUN curl -fsSL https://mise.run | sh
+ENV PATH="/root/.local/share/mise/shims:/root/.local/bin:${PATH}"
+SHELL ["/bin/bash", "-lc"]
+RUN eval "$(mise activate bash)"
+
+ARG RUST_VERSION
+RUN mise install rust@${RUST_VERSION}
+RUN mise use -g rust@${RUST_VERSION}
+
+# download source code
+ARG REPO
+ARG COMMIT
+RUN git init && \
+    git remote add origin ${REPO} && \
+    git fetch --depth 1 origin ${COMMIT} && \
+    git checkout FETCH_HEAD
+
+# build
+ARG TEMPO_BUILD_PROFILE=release
+RUN cargo build --profile ${TEMPO_BUILD_PROFILE} --bin tempo
+
+FROM ${BASE_IMAGE}
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y \
+    curl \
+    jq \
+    vim \
+    iproute2 \
+    ca-certificates
+
+ARG TEMPO_BUILD_PROFILE=release
+ARG TEMPO_BUILD_TARGET_FOLDER=/app/target/${TEMPO_BUILD_PROFILE}/tempo
+COPY --from=builder     ${TEMPO_BUILD_TARGET_FOLDER}     /app/tempo
+COPY ./entrypoint.sh                                     /app/

@@ -1,0 +1,10 @@
+services:
+  tempo:
+    build:
+      dockerfile: Dockerfile.dev
+      args:
+        - REPO=${TEMPO_REPO}
+        - COMMIT=${TEMPO_COMMIT}
+        - RUST_VERSION=${RUST_VERSION}
+        - TEMPO_BUILD_PROFILE=dev
+        - TEMPO_BUILD_TARGET_FOLDER=/app/target/debug/tempo

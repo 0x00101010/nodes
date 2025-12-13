@@ -1,0 +1,50 @@
+volumes:
+  tempo_data:
+  prometheus_data:
+
+networks:
+  shared_network:
+    external: true
+
+services:
+  tempo:
+    build:
+      context: ../../../services/tempo
+      # dockerfile is specified in profile-specific override files
+      # args is specified in profile-specific override files as well
+    command: [ "/app/entrypoint.sh" ]
+    container_name: "${TEMPO_DNS}"
+    restart: unless-stopped
+    volumes:
+      - tempo_data:/data
+    ports:
+      - "${TEMPO_RPC_PORT}:${TEMPO_RPC_PORT}" # json rpc
+      - "${TEMPO_WS_PORT}:${TEMPO_WS_PORT}" # ws rpc
+      - "${TEMPO_METRICS_PORT}:${TEMPO_METRICS_PORT}" # prometheus metrics
+      - "${TEMPO_P2P_PORT}:${TEMPO_P2P_PORT}"
+      - "${TEMPO_P2P_PORT}:${TEMPO_P2P_PORT}/udp"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+      - .env.local
+
+  prometheus:
+    build:
+      context: ../../../services/prometheus
+      dockerfile: Dockerfile
+    container_name: "${PROMETHEUS_DNS}"
+    command: [ "/app/prometheus-entrypoint.sh" ]
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/data
+      - ./prometheus-template.yml:/app/prometheus-template.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+    networks:
+      - shared_network
+    env_file:
+      - .env
+      - .env.local

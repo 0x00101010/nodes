@@ -1,0 +1,6 @@
+services:
+  tempo:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - TEMPO_VERSION=${TEMPO_VERSION}
