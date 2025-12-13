@@ -64,7 +64,7 @@ services:
       - ./exporters/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     ports:
-      - "9090:9090"
+      - "9190:9190"
     networks:
       - monitoring
       - shared_network
@@ -83,7 +83,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
     ports:
-      - "${GRAFANA_PORT}:3000"
+      - "3000:3000"
     networks:
       - monitoring
       - shared_network
