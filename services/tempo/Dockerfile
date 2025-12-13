@@ -28,6 +28,8 @@ RUN case "${TARGETARCH}" in \
     esac && \
     wget "https://github.com/tempoxyz/tempo/releases/download/${TEMPO_VERSION}/tempo-${TEMPO_VERSION}-${TEMPO_ARCH}-${TEMPO_OS}.tar.gz" && \
     tar -xvf "tempo-${TEMPO_VERSION}-${TEMPO_ARCH}-${TEMPO_OS}.tar.gz" && \
-    rm -rf "tempo-${TEMPO_VERSION}-${TEMPO_ARCH}-${TEMPO_OS}*"
+    mv "tempo-${TEMPO_VERSION}-${TEMPO_ARCH}-${TEMPO_OS}" tempo && \
+    rm "tempo-${TEMPO_VERSION}-${TEMPO_ARCH}-${TEMPO_OS}.tar.gz"
 
 COPY ./entrypoint.sh    /app/
+

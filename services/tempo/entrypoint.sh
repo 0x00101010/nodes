@@ -7,6 +7,8 @@ TEMPO_RPC_PORT="${TEMPO_RPC_PORT:-8545}"
 TEMPO_ALLOWED_APIS="${TEMPO_ALLOWED_APIS:-eth,net,web3,txpool,trace}"
 TEMPO_METRICS_PORT="${TEMPO_METRICS_PORT:-6060}"
 
+ADDITIONAL_ARGS=""
+
 # /// Set the minimum log level.
 # ///
 # /// -v      Errors
