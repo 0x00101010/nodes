@@ -44,6 +44,7 @@ esac
 exec ./tempo \
     node \
     $LOG_FLAG \
+    --full \
     --datadir "$TEMPO_DATA_DIR" \
     --follow \
     --http \
