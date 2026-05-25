@@ -1,6 +1,8 @@
 volumes:
-  reth_data:
-    name: base_mainnet_reth_data
+  el_data:
+    name: base_mainnet_el_data
+  cl_data:
+    name: base_mainnet_cl_data
   prometheus_data:
     name: base_mainnet_prometheus_data
 
@@ -9,58 +11,96 @@ networks:
     external: true
 
 services:
-  base-mainnet-reth:
+  el-snapshot-init:
     build:
-      context: ../../../services/reth
+      context: ../../../services/snapshot-init
       dockerfile: Dockerfile
-    container_name: base-mainnet-reth
-    command: [ "/app/reth-entrypoint.sh" ]
-    restart: unless-stopped
+    command: [ "/app/entrypoint.sh" ]
+    container_name: "${EL_DNS}-snapshot-init"
+    restart: "no"
     volumes:
-      - reth_data:/data
+      - el_data:/data
+    networks:
+      - shared_network
+    env_file:
+      - .env
+      - .env.local
+
+  el:
+    build:
+      context: ../../../services/base-reth-node
+      dockerfile: Dockerfile
+      args:
+        - REPO=${BASE_REPO}
+        - COMMIT=${BASE_COMMIT}
+        - RUST_VERSION=${RUST_VERSION}
+    command: [ "/app/entrypoint.sh" ]
+    container_name: "${EL_DNS}"
+    restart: unless-stopped
+    depends_on:
+      el-snapshot-init:
+        condition: service_completed_successfully
+    volumes:
+      - el_data:/data
       - ./secrets/jwtsecret:/config/jwtsecret
     ports:
       - "${EL_RPC_PORT}:${EL_RPC_PORT}" # json rpc
       - "${EL_WS_PORT}:${EL_WS_PORT}" # ws rpc
-      - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus at host 7001
+      - "${EL_METRICS_PORT}:${EL_METRICS_PORT}" # prometheus
       - "${EL_AUTHRPC_PORT}:${EL_AUTHRPC_PORT}"
       - "${EL_P2P_PORT}:${EL_P2P_PORT}"
+      - "${EL_P2P_PORT}:${EL_P2P_PORT}/udp"
+      - "${EL_DISCOVERY_V5_PORT}:${EL_DISCOVERY_V5_PORT}/udp"
     networks:
       - shared_network
     env_file:
       - .env
+      - .env.local
 
-  base-mainnet-node:
+  cl:
     build:
-      context: ../../../services/op-node
+      context: ../../../services/base-consensus
       dockerfile: Dockerfile
-    container_name: base-mainnet-node
-    command: [ "/app/op-node-entrypoint.sh" ]
+      args:
+        - REPO=${BASE_REPO}
+        - COMMIT=${BASE_COMMIT}
+        - RUST_VERSION=${RUST_VERSION}
+    command: [ "/app/entrypoint.sh" ]
+    container_name: "${CL_DNS}"
     restart: unless-stopped
+    depends_on:
+      el:
+        condition: service_started
     volumes:
+      - cl_data:/data
       - ./secrets/jwtsecret:/config/jwtsecret
     ports:
-      - "${OP_NODE_RPC_PORT}:${OP_NODE_RPC_PORT}"
-      - "${OP_NODE_METRICS_PORT}:${OP_NODE_METRICS_PORT}"
-      - "${OP_NODE_P2P_LISTEN_TCP_PORT}:${OP_NODE_P2P_LISTEN_TCP_PORT}"
-      - "${OP_NODE_P2P_LISTEN_UDP_PORT}:${OP_NODE_P2P_LISTEN_UDP_PORT}/udp"
+      - "${BASE_NODE_RPC_PORT}:${BASE_NODE_RPC_PORT}"
+      - "${BASE_NODE_METRICS_PORT}:${BASE_NODE_METRICS_PORT}"
+      - "${BASE_NODE_P2P_LISTEN_TCP_PORT}:${BASE_NODE_P2P_LISTEN_TCP_PORT}"
+      - "${BASE_NODE_P2P_LISTEN_UDP_PORT}:${BASE_NODE_P2P_LISTEN_UDP_PORT}/udp"
     networks:
       - shared_network
     env_file:
       - .env
+      - .env.local
 
-  base-mainnet-prometheus:
+  prometheus:
     build:
       context: ../../../services/prometheus
       dockerfile: Dockerfile
-    container_name: base-mainnet-prometheus
+    container_name: "${PROMETHEUS_DNS}"
     command: [ "/app/prometheus-entrypoint.sh" ]
     restart: unless-stopped
     volumes:
       - prometheus_data:/data
+      - ./prometheus-template.yml:/app/prometheus-template.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
     networks:
       - shared_network
     env_file:
       - .env
+      - .env.local

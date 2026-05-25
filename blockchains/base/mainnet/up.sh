@@ -21,7 +21,7 @@ fi
 # Source .env (and .env.local if present) so we can inspect SNAPSHOT_MODE
 # before invoking docker compose.
 set -a
-# .env.local first so .env can reference vars from it (e.g. SEPOLIA_L1_ETH_RPC)
+# .env.local first so .env can reference vars from it (e.g. MAINNET_L1_ETH_RPC)
 # shellcheck disable=SC1091
 [ -f .env.local ] && . ./.env.local
 # shellcheck disable=SC1091
