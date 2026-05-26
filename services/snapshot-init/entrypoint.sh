@@ -4,8 +4,9 @@
 #
 # Modes (via SNAPSHOT_MODE):
 #   skip     - no-op, exit 0. Reth uses whatever already exists in SNAPSHOT_DATA_DIR.
-#   download - wipe SNAPSHOT_DATA_DIR, download a snapshot via aria2c, extract
-#              .tar.zst into SNAPSHOT_DATA_DIR.
+#   download - download a snapshot via aria2c, extract .tar.zst into
+#              SNAPSHOT_DATA_DIR. Fresh downloads wipe SNAPSHOT_DATA_DIR;
+#              interrupted downloads are resumed without wiping first.
 #
 # Env vars:
 #   SNAPSHOT_MODE                  skip | download                (default: skip)
@@ -64,12 +65,19 @@ log "data dir     : ${DATA_DIR}"
 log "work dir     : ${WORK_DIR}"
 log "aria2 conns  : ${CONN}"
 
+RESUME_DOWNLOAD=false
+if [ -f "${WORK_DIR}/${LOCAL_NAME}.aria2" ] || [ -f "${WORK_DIR}/${LOCAL_NAME}" ]; then
+    RESUME_DOWNLOAD=true
+fi
+
 mkdir -p "$DATA_DIR" "$WORK_DIR"
 
-# Wipe everything in DATA_DIR EXCEPT the work dir so an in-flight download can
-# be resumed across container restarts (aria2c -c).
-log "wiping ${DATA_DIR} (preserving ${WORK_DIR})"
-find "$DATA_DIR" -mindepth 1 -maxdepth 1 ! -path "$WORK_DIR" -exec rm -rf {} +
+if [ "$RESUME_DOWNLOAD" = "true" ]; then
+    log "found existing snapshot download for ${LOCAL_NAME}; preserving ${DATA_DIR} and resuming"
+else
+    log "wiping ${DATA_DIR} (preserving ${WORK_DIR})"
+    find "$DATA_DIR" -mindepth 1 -maxdepth 1 ! -path "$WORK_DIR" -exec rm -rf {} +
+fi
 
 log "downloading snapshot via aria2c"
 aria2c \

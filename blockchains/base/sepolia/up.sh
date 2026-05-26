@@ -34,8 +34,8 @@ set +a
 # them and reuse the stale completed state, in which case the new
 # SNAPSHOT_MODE value never reaches the container. A full `down` guarantees
 # the init container is recreated from scratch on the next `up`. Volumes
-# survive `down`, and snapshot-init wipes the data dir itself in download
-# mode.
+# survive `down`, and snapshot-init handles fresh-vs-resume download state
+# inside the data dir.
 if [ "${SNAPSHOT_MODE:-skip}" = "download" ]; then
     echo "==> SNAPSHOT_MODE=download: tearing down stack so snapshot-init re-runs"
     docker compose down --remove-orphans
