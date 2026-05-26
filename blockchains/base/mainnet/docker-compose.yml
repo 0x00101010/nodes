@@ -23,8 +23,9 @@ services:
     networks:
       - shared_network
     env_file:
-      - .env
-      - .env.local
+      - path: .env
+      - path: .env.local
+        required: false
 
   el:
     build:
@@ -54,8 +55,9 @@ services:
     networks:
       - shared_network
     env_file:
-      - .env
-      - .env.local
+      - path: .env
+      - path: .env.local
+        required: false
 
   cl:
     build:
@@ -82,8 +84,9 @@ services:
     networks:
       - shared_network
     env_file:
-      - .env
-      - .env.local
+      - path: .env
+      - path: .env.local
+        required: false
 
   prometheus:
     build:
@@ -102,5 +105,6 @@ services:
     networks:
       - shared_network
     env_file:
-      - .env
-      - .env.local
+      - path: .env
+      - path: .env.local
+        required: false

@@ -59,6 +59,78 @@ case "${RETH_LOG_LEVEL,,}" in
         ;;
 esac
 
+if [ "${RETH_PROOFS_HISTORY_STORAGE_PATH+x}" = x ] && [ "${RETH_PROOFS_HISTORY_INIT:-true}" = "true" ]; then
+    /app/base-reth-node \
+        node \
+        $LOG_FLAG \
+        --chain "$RETH_CHAIN" \
+        --datadir "$RETH_DATA_DIR" \
+        --log.stdout.format log-fmt \
+        --http \
+        --http.addr "127.0.0.1" \
+        --http.port "$EL_RPC_PORT" \
+        --http.api eth \
+        $ADDITIONAL_ARGS &
+
+    RETH_PID=$!
+    MAX_WAIT="${RETH_PROOFS_HISTORY_INIT_MAX_WAIT_SECONDS:-21600}"
+
+    while true; do
+        RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["latest", false],"id":1}' "http://127.0.0.1:$EL_RPC_PORT" 2>/dev/null || true)
+        BLOCK_NUMBER=$(printf '%s' "$RESPONSE" | jq -r '.result.number // empty' 2>/dev/null || true)
+
+        if [ "$BLOCK_NUMBER" = "0x0" ]; then
+            echo "waiting for reth node to sync beyond genesis block"
+        elif [ -n "$BLOCK_NUMBER" ]; then
+            break
+        else
+            echo "waiting for reth node to start up"
+        fi
+
+        if ! kill -0 "$RETH_PID" 2>/dev/null; then
+            echo "reth node exited before proofs init readiness" 1>&2
+            wait "$RETH_PID" || true
+            exit 1
+        fi
+
+        sleep 1
+        MAX_WAIT=$((MAX_WAIT - 1))
+        if [ "$MAX_WAIT" -eq 0 ]; then
+            echo "timed out waiting for reth node to start up" 1>&2
+            kill "$RETH_PID" || true
+            exit 1
+        fi
+    done
+
+    kill "$RETH_PID" || true
+    wait "$RETH_PID" || echo "warning: reth node exited with code $?"
+
+    /app/base-reth-node \
+        proofs \
+        init \
+        $LOG_FLAG \
+        --log.stdout.format log-fmt \
+        --chain "$RETH_CHAIN" \
+        --datadir "$RETH_DATA_DIR" \
+        --proofs-history.storage-path "$RETH_PROOFS_HISTORY_STORAGE_PATH"
+fi
+
+if [ "${RETH_PROOFS_HISTORY_STORAGE_PATH+x}" = x ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --proofs-history --proofs-history.storage-path $RETH_PROOFS_HISTORY_STORAGE_PATH"
+fi
+
+if [ "${RETH_PROOFS_HISTORY_WINDOW+x}" = x ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --proofs-history.window $RETH_PROOFS_HISTORY_WINDOW"
+fi
+
+if [ "${RETH_PROOFS_HISTORY_PRUNE_INTERVAL+x}" = x ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --proofs-history.prune-interval $RETH_PROOFS_HISTORY_PRUNE_INTERVAL"
+fi
+
+if [ "${RETH_PROOFS_HISTORY_VERIFICATION_INTERVAL+x}" = x ]; then
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --proofs-history.verification-interval $RETH_PROOFS_HISTORY_VERIFICATION_INTERVAL"
+fi
+
 exec /app/base-reth-node \
     node \
     $LOG_FLAG \
