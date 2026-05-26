@@ -15,6 +15,7 @@
 #   SNAPSHOT_DATA_DIR              where reth data lives          (default: /data)
 #   SNAPSHOT_WORK_DIR              where aria2c stores download   (default: $DATA_DIR/_snapshot)
 #   SNAPSHOT_ARIA2_CONNECTIONS     -x / -s value for aria2c       (default: 16)
+#   SNAPSHOT_FORCE_WIPE            wipe data/work dirs before downloading (default: false)
 
 set -euo pipefail
 
@@ -25,6 +26,7 @@ MODE="${SNAPSHOT_MODE:-skip}"
 DATA_DIR="${SNAPSHOT_DATA_DIR:-/data}"
 WORK_DIR="${SNAPSHOT_WORK_DIR:-${DATA_DIR}/_snapshot}"
 CONN="${SNAPSHOT_ARIA2_CONNECTIONS:-16}"
+FORCE_WIPE="${SNAPSHOT_FORCE_WIPE:-false}"
 
 case "$MODE" in
     skip)
@@ -35,6 +37,15 @@ case "$MODE" in
         ;;
     *)
         err "invalid SNAPSHOT_MODE='${MODE}' (expected: skip|download)"
+        exit 1
+        ;;
+esac
+
+case "$FORCE_WIPE" in
+    true|false)
+        ;;
+    *)
+        err "invalid SNAPSHOT_FORCE_WIPE='${FORCE_WIPE}' (expected: true|false)"
         exit 1
         ;;
 esac
@@ -64,6 +75,7 @@ log "snapshot URL : ${URL}"
 log "data dir     : ${DATA_DIR}"
 log "work dir     : ${WORK_DIR}"
 log "aria2 conns  : ${CONN}"
+log "force wipe   : ${FORCE_WIPE}"
 
 RESUME_DOWNLOAD=false
 if [ -f "${WORK_DIR}/${LOCAL_NAME}.aria2" ] || [ -f "${WORK_DIR}/${LOCAL_NAME}" ]; then
@@ -72,7 +84,14 @@ fi
 
 mkdir -p "$DATA_DIR" "$WORK_DIR"
 
-if [ "$RESUME_DOWNLOAD" = "true" ]; then
+if [ "$FORCE_WIPE" = "true" ]; then
+    log "SNAPSHOT_FORCE_WIPE=true: wiping ${DATA_DIR} and ${WORK_DIR} before downloading"
+    find "$DATA_DIR" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+    if [ "$WORK_DIR" != "$DATA_DIR" ]; then
+        rm -rf "$WORK_DIR"
+    fi
+    mkdir -p "$WORK_DIR"
+elif [ "$RESUME_DOWNLOAD" = "true" ]; then
     log "found existing snapshot download for ${LOCAL_NAME}; preserving ${DATA_DIR} and resuming"
 else
     log "wiping ${DATA_DIR} (preserving ${WORK_DIR})"
