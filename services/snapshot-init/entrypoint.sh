@@ -5,8 +5,12 @@
 # Modes (via SNAPSHOT_MODE):
 #   skip     - no-op, exit 0. Reth uses whatever already exists in SNAPSHOT_DATA_DIR.
 #   download - download a snapshot via aria2c, extract .tar.zst into
-#              SNAPSHOT_DATA_DIR. Fresh downloads wipe SNAPSHOT_DATA_DIR;
-#              interrupted downloads are resumed without wiping first.
+#              SNAPSHOT_DATA_DIR.
+#                * SNAPSHOT_DATA_DIR empty           -> fresh download
+#                * resumable download in WORK_DIR    -> resume, keep data
+#                * SNAPSHOT_DATA_DIR already populated and no resumable
+#                  download                          -> exit 0 (no-op)
+#                * SNAPSHOT_FORCE_WIPE=true          -> wipe data + work, redownload
 #
 # Env vars:
 #   SNAPSHOT_MODE                  skip | download                (default: skip)
@@ -82,10 +86,14 @@ if [ -f "${WORK_DIR}/${LOCAL_NAME}.aria2" ] || [ -f "${WORK_DIR}/${LOCAL_NAME}" 
     RESUME_DOWNLOAD=true
 fi
 
-mkdir -p "$DATA_DIR" "$WORK_DIR"
+DATA_NONEMPTY=false
+if [ -d "$DATA_DIR" ] && [ -n "$(find "$DATA_DIR" -mindepth 1 -maxdepth 1 ! -path "$WORK_DIR" -print -quit)" ]; then
+    DATA_NONEMPTY=true
+fi
 
 if [ "$FORCE_WIPE" = "true" ]; then
     log "SNAPSHOT_FORCE_WIPE=true: wiping ${DATA_DIR} and ${WORK_DIR} before downloading"
+    mkdir -p "$DATA_DIR"
     find "$DATA_DIR" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
     if [ "$WORK_DIR" != "$DATA_DIR" ]; then
         rm -rf "$WORK_DIR"
@@ -93,9 +101,14 @@ if [ "$FORCE_WIPE" = "true" ]; then
     mkdir -p "$WORK_DIR"
 elif [ "$RESUME_DOWNLOAD" = "true" ]; then
     log "found existing snapshot download for ${LOCAL_NAME}; preserving ${DATA_DIR} and resuming"
+    mkdir -p "$DATA_DIR" "$WORK_DIR"
+elif [ "$DATA_NONEMPTY" = "true" ]; then
+    log "${DATA_DIR} is not empty and no resumable download found in ${WORK_DIR}"
+    log "refusing to wipe existing data; set SNAPSHOT_FORCE_WIPE=true to override"
+    exit 0
 else
-    log "wiping ${DATA_DIR} (preserving ${WORK_DIR})"
-    find "$DATA_DIR" -mindepth 1 -maxdepth 1 ! -path "$WORK_DIR" -exec rm -rf {} +
+    log "${DATA_DIR} is empty; starting fresh snapshot download"
+    mkdir -p "$DATA_DIR" "$WORK_DIR"
 fi
 
 log "downloading snapshot via aria2c"
